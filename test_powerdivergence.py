@@ -28,7 +28,7 @@ def ts_powerdivergence(var1, var2=None, expCounts=None, lambd=2/3, corr=None):
         lambd=-0.5
         testUsed = "Freeman-Tukey"
     elif lambd==-2 or lambd=="neyman":
-        lambd==-2
+        lambd=-2
         testUsed = "Neyman"
     else:
         testUsed = "power divergence with lambda = " + str(lambd)
