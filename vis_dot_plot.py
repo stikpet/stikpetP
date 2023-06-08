@@ -57,7 +57,7 @@ def vi_dot_plot(data, dotSize = 1):
     freq = data.value_counts()
     
     # divide if needed by number of dots each should represent
-    n_dots = (freq/dot_rep).astype(np.int64)
+    n_dots = (freq/dotSize).astype(np.int64)
     
     # create an array for each categorie that has the label, and 
     # a consecutive number going from the first to the last case in that category
