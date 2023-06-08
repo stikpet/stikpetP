@@ -71,6 +71,6 @@ def vi_dot_plot(data, dotSize = 1):
         my_data = np.concatenate((my_data,a[i]),axis=0)
     
     plt.scatter(x=my_data[:,0], y=my_data[:,1])
-    plt.ylabel("x " + str(dot_rep))
+    plt.ylabel("x " + str(dotSize))
     
     return plt
