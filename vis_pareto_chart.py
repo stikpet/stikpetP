@@ -74,7 +74,7 @@ def vi_pareto_chart(data, varname=None):
     myFreqTable = myFreqTable.reset_index(drop=True)
     myFreqTable['Cumulative Percent'] = myFreqTable['Frequency'].cumsum() / myFreqTable['Frequency'].sum() * 100
     fig,ax=plt.subplots()
-    ax.set_xlabel(field)
+    ax.set_xlabel(varname)
     ax.bar('category', 'Frequency', data = myFreqTable)
     ax.set_ylabel("percent")
     ax.set_ylim(ymin=0)
