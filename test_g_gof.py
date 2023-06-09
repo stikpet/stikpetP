@@ -101,10 +101,10 @@ def ts_g_gof(data, expCount=None, cc=None):
     Examples
     --------
     >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> ts_g_gof(data)
+    >>> ts_g_gof(data['marital'])
     >>> eCounts = pd.DataFrame({'category' : ["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED"], 'count' : [5,5,5,5]})
-    >>> ts_g_gof(data, eCounts)
-    >>> ts_g_gof(data, cc="pearson")
+    >>> ts_g_gof(data['marital'], eCounts)
+    >>> ts_g_gof(data['marital'], cc="pearson")
     
     '''
     
@@ -133,7 +133,7 @@ def ts_g_gof(data, expCount=None, cc=None):
         
         freq = pd.DataFrame(columns = ["category", "count"])
         for i in range(0, k):
-            nk = data[data==expCount.iloc[i, 0]].count()[0]
+            nk = data[data==expCount.iloc[i, 0]].count()
             lk = expCount.iloc[i, 0]
             freq = pd.concat([freq, pd.DataFrame([{"category": lk, "count": nk}])])
         
