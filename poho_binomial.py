@@ -1,5 +1,5 @@
 import pandas as pd
-import ts_binomial_os
+from .test_binomial_os import ts_binomial_os
 
 def ph_binomial(data, expCount=None, twoSidedMethod='eqdist', posthoc = "bonferroni"):
     '''
