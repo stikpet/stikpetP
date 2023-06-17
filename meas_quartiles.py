@@ -1,127 +1,12 @@
 import pandas as pd
 import math
-
-def he_quartileIndexing(data, method="sas1"):
-    n = len(data)
-    if method=="inclusive":
-        if (n % 2) == 0:
-            q1Index = (n + 2)/ 4
-            q3Index = (3*n + 1)/4
-        else:
-            q1Index = (n + 3)/ 4
-            q3Index = (3*n + 1)/4
-    elif method=="exclusive":
-        if (n % 2) == 0:
-            q1Index = (n + 2)/ 4
-            q3Index = (3*n + 1)/4
-        else:
-            q1Index = (n + 1)/ 4
-            q3Index = (3*n + 3)/4
-            
-    elif method=="sas1":        
-        q1Index = n*1/4
-        q3Index = n*3/4
-    elif method=="sas4":
-        q1Index = (n + 1)*1/4
-        q3Index = (n + 1)*3/4
-    elif method=="hl":  
-        q1Index = n*1/4 + 1/2
-        q3Index = n*3/4 + 1/2
-    elif method=="excel":
-        q1Index = (n - 1)*1/4 + 1
-        q3Index = (n - 1)*3/4 + 1
-    elif method=="hf8":
-        q1Index = (n + 1/3)*1/4 + 1/3
-        q3Index = (n + 1/3)*3/4 + 1/3
-    elif method=="hf9":
-        q1Index = (n + 1/4)*1/4 + 3/8
-        q3Index = (n + 1/4)*3/4 + 3/8
-        
-    return q1Index, q3Index
-
-def he_quartileIndex(data, indexMethod, q1Frac="linear", q1Int="int", q3Frac="linear", q3Int="int"):
-    n = len(data)
-    iq1, iq3 = he_quartileIndexing(data, indexMethod)
-
-    if round(iq1) == iq1:
-        # index is integer
-        if q1Int == "int":
-            q1 = iq1
-        elif q1Int == "midpoint":
-            q1 = iq1 + 1/2
-    else:
-        # index has fraction
-        if q1Frac == "linear":
-            q1 = iq1
-        elif q1Frac == "down":
-            q1 = math.floor(iq1)
-        elif q1Frac == "up":
-            q1 = math.ceil(iq1)
-        elif q1Frac == "bankers":
-            q1 = round(iq1)
-        elif q1Frac == "nearest":
-            q1 = int(iq1 + 0.5)
-        elif q1Frac == "halfdown":
-            if iq1 + 0.5 == round(iq1 + 0.5):
-                q1 = math.floor(iq1)
-            else:
-                q1 = round(iq1)
-        elif q1Frac == "midpoint":
-            q1 = (math.floor(iq1) + math.ceil(iq1)) / 2
-    
-    q1i = q1
-    q1iLow = math.floor(q1i)
-    q1iHigh = math.ceil(q1i)
-
-    if q1iLow==q1iHigh:
-        q1 = data[int(q1iLow-1)]
-    else:
-        #Linear interpolation:
-        q1 = data[int(q1iLow-1)] + (q1i - q1iLow)/(q1iHigh - q1iLow)*(data[int(q1iHigh-1)] - data[int(q1iLow-1)])
-        
-    if round(iq3) == iq3:
-        # index is integer
-        if q3Int == "int":
-            q3 = iq3
-        elif q3Int == "midpoint":
-            q3 = iq3 + 1/2
-    else:
-        # index has fraction
-        if q3Frac == "linear":
-            q3 = iq3
-        elif q3Frac == "down":
-            q3 = math.floor(iq3)
-        elif q3Frac == "up":
-            q3 = math.ceil(iq3)
-        elif q3Frac == "bankers":
-            q3 = round(iq3)
-        elif q3Frac == "nearest":
-            q3 = int(iq3 + 0.5)
-        elif q3Frac == "halfdown":
-            if iq3 + 0.5 == round(iq3 + 0.5):
-                q3 = math.floor(iq3)
-            else:
-                q3 = round(iq3)
-        elif q3Frac == "midpoint":
-            q3 = (math.floor(iq3) + math.ceil(iq3)) / 2
-                
-    q3i = q3
-    q3iLow = math.floor(q3i)
-    q3iHigh = math.ceil(q3i)
-
-    if q3iLow==q3iHigh:
-        q3 = data[int(q3iLow-1)]
-    else:
-        #Linear interpolation:
-        q3 = data[int(q3iLow-1)] + (q3i - q3iLow)/(q3iHigh - q3iLow)*(data[int(q3iHigh-1)] - data[int(q3iLow-1)])
-        
-    return q1, q3
+from .help_quartileIndex import he_quartileIndex
 
 def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="linear", q1Int="int", q3Frac="linear", q3Int="int"):
     '''
     Quartiles / Hinges
     
-    The quartiles are at quarters of the data. The median is at 50%, and the quartiles at 25% and 75%. Note that there are five quartiles, the minimum value is the 0-quartile, at 25% the first (or lower) quartile, at 50% the median a.k.a. the second quartile, at 75% the third (or upper) quartile, and the maximum as the fourth quartile.
+    The quartiles are at quarters of the data (McAlister, 1879, p. 374; Galton, 1881, p. 245). The median is at 50%, and the quartiles at 25% and 75%. Note that there are five quartiles, the minimum value is the 0-quartile, at 25% the first (or lower) quartile, at 50% the median a.k.a. the second quartile, at 75% the third (or upper) quartile, and the maximum as the fourth quartile.
     
     Tukey (1977) also introduced the term Hinges and sorted the values in a W shape, where the bottom parts of the W are then the hinges.
     
@@ -129,7 +14,7 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
     
     Parameters
     ----------
-    data : pandas series with the data as numbers
+    data : pandas series with
     levels : optional dictionary with coding to use
     method : optional which method to use to calculate quartiles.
     indexMethod : optional to indicate which type of indexing to use
@@ -137,6 +22,14 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
     q1Int : optional to indicate the use of the integer or the midpoint method for first quarter
     q3Frac : optional to indicate what type of rounding to use for third quarter
     q3Int : optional to indicate the use of the integer or the midpoint method for third quarter
+    
+    method can be set to "own" and then provide the next parameters, or any of the methods listed in the notes.
+    
+    indexMethod can be set to "inclusive", "exclusive", "sas1", "sas4", "excel", "hl", "hf8", or "hf9".
+    
+    q1Frac and q3Frac can be set to: "linear", "down", "up", "bankers", "nearest", "halfdown", or "midpoint".
+    
+    q1Int and q3Int can be set to: "int" or "midpoint".
     
     Returns
     -------
@@ -148,66 +41,12 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
     
     Notes
     -----
-    The **inclusive** method divides the data into two, and then includes the median in each half (if the sample size is odd). The first and third quarter are then the median of each of these two halves.
+    To determine the quartiles a specific indexing method can be used. See \code{\link{he_quartileIndexing}} for details on the different methods to choose from.
     
-    For the **inclusive** method, the index of the first quartile can be found using:
-    $$iQ_1 = \\begin{cases} \\frac{n+2}{4} & \\text{ if } n \\text{ mod } 2 = 0 \\\\ \\frac{n+3}{4} & \\text{ else } \\end{cases}$$
+    Then based on the indexes either linear interpolation or different rounding methods (bankers, nearest, down, up, half-down) can be used, or the midpoint between the two values. If the index is an integer either the integer or the mid point is used. 
     
-    And the third quartile:
-    $$iQ_3 = \\begin{cases} \\frac{3\\times n +2}{4} & \\text{ if } n \\text{ mod } 2 = 0 \\\\ \\frac{3\\times n+1}{4} & \\text{ else } \\end{cases}$$
+    See the **he_quartilesIndex()** for details on this.
     
-    The **exclusive** method does the same as the inclusive method, but excludes the median in each half (if the sample size is odd).
-    
-    For the **exclusive** method, the index of the first quartile can be found using:
-    $$iQ_1 = \\begin{cases} \\frac{n+2}{4} & \\text{ if } n \\text{ mod } 2 = 0 \\\\ \\frac{n + 1}{4} & \\text{ else } \\end{cases}$$
-
-    And the third quartile:
-    $$iQ_3 = \\begin{cases} \\frac{3\\times n +2}{4} & \\text{ if } n \\text{ mod } 2 = 0 \\\\ \\frac{3\\times n + 3}{4} & \\text{ else } \\end{cases}$$
-    
-    Other methods use a different indexing. Six alternatives for the indexing is:
-    
-    Most basic (**SAS1**):
-    $$iQ_i = n\\times p_i$$
-
-    **SAS4** method uses for indexing:
-    $$iQ_i = \\left(n + 1\\right)\\times p_i$$
-
-    **Hog and Ledolter** use for their indexing:
-
-    $$iQ_i = n\\times p_i + \\frac{1}{2}$$
-
-    **MS Excel** uses for indexing:
-    $$iQ_i = \\left(n - 1\\right)\\times p_i + 1$$
-
-    **Hyndman and Fan** use for their 8th version:
-    $$iQ_i = \\left(n + \\frac{1}{3}\\right)\\times p_i + \\frac{1}{3}$$
-
-    **Hyndman and Fan** use for their 9th version:
-    $$iQ_i = \\left(n + \\frac{1}{4}\\right)\\times p_i + \\frac{3}{8}$$
-    
-    If **the index is an integer** often that integer will be used to find the corresponding value in the sorted data. However, in some rare methods they argue to take the midpoint between the found index and the next one, i.e. to use:
-
-    $$iQ_i = iQ_i + \\frac{1}{2}$$
-
-    If the index has a fractional part, we could use linear interpolation. It can be written as:
-
-    $$X\\left[\\lfloor iQ_i \\rfloor\\right] + \\frac{iQ_i - \\lfloor iQ_i \\rfloor}{\\lceil iQ_i \\rceil - \\lfloor iQ_i \\rfloor} \\times \\left(X\\left[\\lceil iQ_i \\rceil\\right] - X\\left[\\lfloor iQ_i \\rfloor\\right]\\right)$$
-
-    Where:
-    * \(X\\left[x\\right]\) is the x-th score of the sorted scores 
-    * \(\\lfloor\\dots\\rfloor\) is the function to always round down
-    * \(\\lceil\\dots\\rceil\) is the function to always round up
-
-    Or we can use 'rounding'. But there are different versions of rounding. Besides the already mentioned round down and round up versions:
-
-    * \(\\lfloor\\dots\\rceil\) to indicate rounding to the nearest even integer. A value of 2.5 gets rounded to 2, while 1.5 also gets rounded to 2. This is also referred to as *bankers* method.
-    * \(\\left[\\dots\\right]\) to indicate rounding to the nearest integer. A value that ends with .5 is then always rounded up.
-    * \(\\left< \\dots\\right>\) to indicate to round a value ending with .5 always down
-
-    or even use the midpoint again i.e.:
-
-    $$\\frac{\\lfloor iQ_i \\rfloor + \\lceil iQ_i \\rceil}{2}$$
-
     Note that the rounding method can even vary per quartile, i.e. the one used for the first quartile being different than the one for the second.
 
     I've come across the following methods:
@@ -236,25 +75,26 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
 
     1. inclusive = tukey =hinges = vining. (Tukey, 1977, p. 32; Siegel & Morgan, 1996, p. 77; Vining, 1998, p. 44).
     1. exclusive = jf. (Moore & McCabe, 1989, p. 33; Joarder & Firozzaman, 2001, p. 88).
-    1. sas1 = parzen = hf4 = interpolated_inverted_cdf. (Parzen, 1979, p. 108; SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 363)
-    1. sas2 = hf3. (SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 362)
-    1. sas3 = hf1 = inverted_cdf (SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 362)
-    1. sas4 = hf6 = minitab = snedecor = weibull  (Hyndman & Fan, 1996, p. 363; Weibull, 1939, p. ?; Snedecor, 1940, p. 43; SAS, 1990, p. 626)
-    1. sas5 = hf2 = CDF = averaged_inverted_cdf (SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 362)
+    1. sas1 = parzen = hf4 = interpolated_inverted_cdf = maple3 = r4. (Parzen, 1979, p. 108; SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 363)
+    1. sas2 = hf3 = r3. (SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 362)
+    1. sas3 = hf1 = inverted_cdf = maple1 = r1 (SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 362)
+    1. sas4 = hf6 = minitab = snedecor = weibull = maple5 = r6 (Hyndman & Fan, 1996, p. 363; Weibull, 1939, p. ?; Snedecor, 1940, p. 43; SAS, 1990, p. 626)
+    1. sas5 = hf2 = CDF = averaged_inverted_cdf = r2 (SAS, 1990, p. 626; Hyndman & Fan, 1996, p. 362)
     1. hf3b = closest_observation 
     1. ms (Mendenhall & Sincich, 1992, p. 35)
     1. lohninger (Lohninger, n.d.)
     1. hl1 (Hogg & Ledolter, 1992, p. 21)
-    1. hl2 = hf5 = Hazen (Hogg & Ledolter, 1992, p. 21； Hazen, 1914, p. ?)
-    1. excel = hf7 = pd1 = linear = gumbel (Hyndman & Fan, 1996, p. 363; Freund & Perles, 1987, p. 201; Gumbel, 1939, p. ?)
+    1. hl2 = hf5 = Hazen = maple4 = r5 (Hogg & Ledolter, 1992, p. 21; Hazen, 1914, p. ?)
+    1. maple2
+    1. excel = hf7 = pd1 = linear = gumbel = maple6 = r7 (Hyndman & Fan, 1996, p. 363; Freund & Perles, 1987, p. 201; Gumbel, 1939, p. ?)
     1. pd2 = lower
     1. pd3 = higher
     1. pd4 = nearest
     1. pd5 = midpoint
-    1. hf8 = median_unbiased (Hyndman & Fan, 1996, p. 363)
-    1. hf9 = normal_unbiased (Hyndman & Fan, 1996, p. 363)
+    1. hf8 = median_unbiased = maple7 = r8 (Hyndman & Fan, 1996, p. 363)
+    1. hf9 = normal_unbiased = maple8 = r9 (Hyndman & Fan, 1996, p. 363)
 
-    *hf* is short for Hyndman and Fan who wrote an article showcasing many different methods, *hl* is short for Hog and Ledolter, *ms* is short for Mendenhall and Sincich, *jf* is short for Joarder and Firozzaman. *sas* refers to the software package SAS.
+    *hf* is short for Hyndman and Fan who wrote an article showcasing many different methods, *hl* is short for Hog and Ledolter, *ms* is short for Mendenhall and Sincich, *jf* is short for Joarder and Firozzaman. *sas* refers to the software package SAS, *maple* to Maple, *pd* to Python's pandas library, and *r* to R.
     
     The names *linear*, *lower*, *higher*, *nearest* and *midpoint* are all used by pandas quantile function and numpy percentile function. Numpy also uses *inverted_cdf*, *averaged_inverted_cdf*, *closest_observation*, *interpolated_inverted_cdf*, *hazen*, *weibull*, *median_unbiased*, and *normal_unbiased*. 
     
@@ -323,27 +163,27 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
         method="inclusive"
     elif method in ["exclusive", "jf"]:
         method ="exclusive"
-    elif method in ["cdf", "sas5", "hf2", "averaged_inverted_cdf"]:
+    elif method in ["cdf", "sas5", "hf2", "averaged_inverted_cdf", "r2"]:
         method = "sas5"
-    elif method in ["sas4", "minitab", "hf6", "weibull"]:
+    elif method in ["sas4", "minitab", "hf6", "weibull", "maple5", "r6"]:
         method = "sas4"
-    elif method in ["excel", "hf7", "pd1", "linear", "gumbel"]:
+    elif method in ["excel", "hf7", "pd1", "linear", "gumbel", "maple6", "r7"]:
         method = "excel"
-    elif method in ["sas1", "parzen", "hf4", "interpolated_inverted_cdf"]:
+    elif method in ["sas1", "parzen", "hf4", "interpolated_inverted_cdf", "maple3", "r4"]:
         method = "sas1"
-    elif method in ["sas2", "hf3"]:
+    elif method in ["sas2", "hf3", "r3"]:
         method = "sas2"
-    elif method in ["sas3", "hf1", "inverted_cdf"]:
+    elif method in ["sas3", "hf1", "inverted_cdf", "maple1", "r1"]:
         method = "sas3"
     elif method in ["hf3b", "closest_observation"]:
         method = "hf3b"
-    elif method in ["hl2", "hazen", "hf5"]:
+    elif method in ["hl2", "hazen", "hf5", "maple4"]:
         method = "hl2"
     elif method in ["np", "midpoint", "pd5"]:
         method = "pd5"
-    elif method in ["hf8", "median_unbiased"]:
+    elif method in ["hf8", "median_unbiased", "maple7", "r8"]:
         method = "hf8"
-    elif method in ["hf9", "normal_unbiased"]:
+    elif method in ["hf9", "normal_unbiased", "maple8", "r9"]:
         method = "hf9"
     elif method in ["pd2", "lower"]:
         method = "pd2"
@@ -392,6 +232,8 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
         settings = ["hf8", "linear","int","linear", "int"]
     elif method=="hf9":
         settings = ["hf9", "linear","int","linear", "int"]
+    elif method=="maple2":
+        settings = ["hl", "down","int","down", "int"]
     
     q1, q3 = he_quartileIndex(dataN, settings[0], settings[1], settings[2], settings[3], settings[4])
     
