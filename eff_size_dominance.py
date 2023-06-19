@@ -1,6 +1,6 @@
 import pandas as pd
 
-def es_dominance(data, mu=None, out="dominance"):
+def es_dominance(data, levels=None, mu=None, out="dominance"):
     '''
     Dominance and a Vargha-Delaney A like effect size measure
     
@@ -8,7 +8,8 @@ def es_dominance(data, mu=None, out="dominance"):
     
     Parameters
     ----------
-    data : Pandas series with the numeric scores
+    data : pandas data series with the data
+    levels : optional dictionary with the categories and numeric value to use
     mu : optional parameter to set the hypothesized median. If not used the midrange is used
     out : optional to either show the "dominance" score (default), or a "vda" like measure
         
@@ -61,7 +62,13 @@ def es_dominance(data, mu=None, out="dominance"):
     
     #remove missing values
     data = data.dropna()
+    if levels is not None:
+        data = data.replace(levels)
+        data = pd.to_numeric(data)
+    else:
+        data = pd.to_numeric(data)
     
+    data = data.sort_values()
     #set hypothesized median to mid range if not provided
     if mu is None:
         mu = (min(data) + max(data)) / 2

@@ -1,7 +1,7 @@
 import pandas as pd
 from scipy.stats import binom
 
-def ts_sign_os(data, mu = None):
+def ts_sign_os(data, levels=None, mu = None):
     '''
     one-sample sign test
      
@@ -9,7 +9,8 @@ def ts_sign_os(data, mu = None):
     
     Parameters
     ----------
-    data : Pandas data series with the data as numbers
+    data : pandas data series with the data
+    levels : optional dictionary with the categories and numeric value to use
     mu : optional hypothesized median, otherwise the midrange will be used
         
     Returns
@@ -56,6 +57,13 @@ def ts_sign_os(data, mu = None):
     '''
     #remove missing values
     data = data.dropna()
+    if levels is not None:
+        data = data.replace(levels)
+        data = pd.to_numeric(data)
+    else:
+        data = pd.to_numeric(data)
+    
+    data = data.sort_values()
     
     #set hypothesized median to mid range if not provided
     if (mu is None):

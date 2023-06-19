@@ -1,6 +1,6 @@
 import pandas as pd
 
-def r_rank_biserial_os(data, mu=None):
+def r_rank_biserial_os(data, levels=None, mu=None):
     '''
     Rank biserial correlation coefficient (one-sample)
      
@@ -8,7 +8,8 @@ def r_rank_biserial_os(data, mu=None):
     
     Parameters
     ----------
-    data : pandas series with the numeric scores
+    data : pandas data series with the data
+    levels : optional dictionary with the categories and numeric value to use
     mu : optional parameter to set the hypothesized median. If not used the midrange is used
         
     Returns
@@ -26,14 +27,14 @@ def r_rank_biserial_os(data, mu=None):
     *Symbols used:*
     * \(R_{pos}\) the sum of the ranks with a positive deviation from the hypothesized median 
     * \(R_{neg}\) the sum of the ranks with a positive deviation from the hypothesized median 
-    * \(R_{min}\) the minimum of \(R_{pos}},\\eqn{R_{neg}\)
+    * \(R_{min}\) the minimum of \(R_{pos}}\),\(\\eqn{R_{neg}\)
     * \(n\) the number of ranks with a non-zero difference with the hypothesized median 
     * \(R\) the sum of all ranks, i.e. \(R_{pos} + R_{neg}\)
     
     If no hypothesized median is provided, the midrange is used, defined as:
     $$\\frac{x_{max} - x_{min}}{2}$$
     
-    Where \(x_{max}\) is the maximum value of the scores, and \\eqn{x_{min}} the minimum
+    Where \(x_{max}\) is the maximum value of the scores, and \(x_{min}\) the minimum
     
     References 
     ----------
@@ -61,6 +62,13 @@ def r_rank_biserial_os(data, mu=None):
     
     #remove missing values
     data = data.dropna()
+    if levels is not None:
+        data = data.replace(levels)
+        data = pd.to_numeric(data)
+    else:
+        data = pd.to_numeric(data)
+    
+    data = data.sort_values()
     
     #set hypothesized median to mid range if not provided
     if (mu is None):

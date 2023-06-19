@@ -25,7 +25,7 @@ def srf(x,y):
     elif y>=0:
         return srf(x-y, y-1) + srf(x, y-1)
 
-def ts_wilcoxon_os(data, mu = None, ties = True, 
+def ts_wilcoxon_os(data, levels=None, mu = None, ties = True, 
                appr = "wilcoxon", eqMed = "wilcoxon", cc = False):
     '''
     one-sample Wilcoxon signed rank test
@@ -38,7 +38,8 @@ def ts_wilcoxon_os(data, mu = None, ties = True,
     
     Parameters
     ----------
-    data : list or Pandas data series with the data as numbers
+    data : Pandas data series with the data
+    levels : optional dictionary with the categories and numeric value to use
     mu : optional hypothesized median, otherwise the midrange will be used
     ties : optional boolean to use a tie correction (default is True)
     appr : optional method to use for approximation. Either "wilcoxon" (default), "exact" "imanz" or "imant" for Iman's z or t approximation
@@ -178,6 +179,13 @@ def ts_wilcoxon_os(data, mu = None, ties = True,
     '''
     #remove missing values
     data = data.dropna()
+    if levels is not None:
+        data = data.replace(levels)
+        data = pd.to_numeric(data)
+    else:
+        data = pd.to_numeric(data)
+    
+    data = data.sort_values()
     
     #set hypothesized median to mid range if not provided
     if (mu is None):
