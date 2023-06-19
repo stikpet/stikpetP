@@ -31,7 +31,7 @@ def me_median(data, levels=None, tieBreaker="between"):
     * \(MI\) the index of the median
     * \(\\tilde{x}\) the median
     
-    If the number of scores is an odd number, and the median falls between two categories, the result will be that the median is the average of those two values. However, if the scores are not numeric the *tieBreaker* can be used. If this is set to *"between"*, the function will return "between X and Y". If it is set to "tieBreaker="low"", the lower value is returned, and if set to "tiebreaker="high"" the upper value is returned.
+    If the number of scores is an odd number, and the median falls between two categories, the *tieBreaker* can be used. If this is set to *"between"*, the function will return the average of the two values, or "between x and y" if levels are used. If it is set to "tieBreaker="low"", the lower value is returned, and if set to "tiebreaker="high"" the upper value is returned.
     
     Some old references to the median are Pacioli (1523) in Italian, Cournot (1843, p. 120) in French, and Galton (1881, p. 246) in English.
     
@@ -58,9 +58,16 @@ def me_median(data, levels=None, tieBreaker="between"):
     # set myField
     data = data.dropna()
     
-    # if no coding is used, all values must be numeric, so we can use the median function:
+    # if no coding is used, all values must be numeric, so we can use the median functions:
     if levels==None:
-        medNum = data.median()
+        
+        if tieBreaker=="low":
+            medNum = data.median_low()
+        elif tieBreaker=="high":
+            medNum = data.median_high()
+        else:
+            medNum = data.median()
+                
         medText = str(medNum)
         
     else:
