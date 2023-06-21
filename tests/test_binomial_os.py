@@ -1,6 +1,8 @@
 import pandas as pd
 from scipy.stats import binom
 
+# This function is used in ph_binomial()
+
 def ts_binomial_os(data, codes=None, p0 = 0.5, twoSidedMethod="eqdist"):
     '''
     Single Binary Test - One-sample binomial
