@@ -17,6 +17,6 @@ You can install the development version of stikpetP from
 [GitHub](https://github.com/) with:
 
 ``` python
-!pip install -https://raw.githubusercontent.com/stikpet/stikpetP/main/stikpetP.tar.gz
+!pip install https://raw.githubusercontent.com/stikpet/stikpetP/main/stikpetP.tar.gz
 import stikpetP as ps
 ```
