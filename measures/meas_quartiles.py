@@ -2,6 +2,8 @@ import pandas as pd
 import math
 from ..helper.help_quartileIndex import he_quartileIndex
 
+#This function is used in me_quartile_range
+
 def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="linear", q1Int="int", q3Frac="linear", q3Int="int"):
     '''
     Quartiles / Hinges
