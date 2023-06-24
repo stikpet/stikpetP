@@ -107,9 +107,7 @@ def tab_frequency(data, order=None):
     '''
     if order is not None:
         data = data.replace(order)
-        data = pd.to_numeric(data)
-    else:
-        data = pd.to_numeric(data)
+        data = pd.Categorical(data, categories=order, ordered=True)
     
     data = data.sort_values()
     
