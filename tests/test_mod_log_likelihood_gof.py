@@ -5,6 +5,7 @@ from scipy.stats import chi2
 def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
     '''
     Mod-Log Likelihood Test of Goodness-of-Fit
+    ------------------------------------------
     
     A test that can be used with a single nominal variable, to test if the probabilities in all the categories are equal (the null hypothesis). If the test has a p-value below a pre-defined threshold (usually 0.05) the assumption they are all equal in the population will be rejected.
     
@@ -12,20 +13,25 @@ def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
     
     Parameters
     ----------
-    data :  list or Pandas data series with the data
-    expCount : optional dataframe with the categories and expected counts 
-    cc : ptional continuity correction None (default), "yates", "pearson", or "williams"
+    data :  list or pandas data series 
+        the data
+    expCount : pandas dataframe, optional 
+        the categories and expected counts
+    cc : {None, "yates", "pearson", "williams"}, optional 
+        which continuity correction to use. Default is None
     
     Returns
     -------
-    testResults : Pandas dataframe with:
+    testResults : pandas dataframe with 
     
-    * *statistic*, the chi-square statistic
-    * *df*, the degrees of freedom
-    * *pValue*, two-sided p-value
+    * *n*, the sample size
+    * *k*, the number of categories
+    * *statistic*, the test statistic (chi-square value)
+    * *df*, degrees of freedom
+    * *p-value*, significance (p-value)
     * *minExp*, the minimum expected count
-    * *propBelow5*, the proportion of expected counts below 5
-    * *testUsed*, a description of the test used
+    * *propBelow5*, the proportion of categories with an expected count below 5
+    * *test*, description of the test used
     
     Notes
     -----
@@ -41,21 +47,22 @@ def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
     $$E_i = \\frac{n}{k}$$
     else:
     $$E_i = n\\times\\frac{E_{p_i}}{n_p}$$
-    $$n_p = \\sum_{i=1}^k E_{p_i}}
+    $$n_p = \\sum_{i=1}^k E_{p_i}$$
     
     *Symbols used:*
-    * \(k\) the number of categories
-    * \(F_i\) the (absolute) frequency of category i
-    * \(E_i\) the expected frequency of category i
-    * \(E_{p_i}\) the provided expected frequency of category i
-    * \(n\) the sample size, i.e. the sum of all frequencies
-    * \(n_p\) the sum of all provided expected counts
-    * \(\\chi^2\\left(\\dots\\right)\) the chi-square cumulative density function
+    
+    * \\(k\\) the number of categories
+    * \\(F_i\\) the (absolute) frequency of category i
+    * \\(E_i\\) the expected frequency of category i
+    * \\(E_{p_i}\\) the provided expected frequency of category i
+    * \\(n\\) the sample size, i.e. the sum of all frequencies
+    * \\(n_p\\) the sum of all provided expected counts
+    * \\(\\chi^2\\left(\\dots\\right)\\) the chi-square cumulative density function
     
     Cressie and Read (1984) is not the original source, but the source where I found the formula.
     
     The Yates continuity correction (cc="yates") is calculated using (Yates, 1934, p. 222):
-    $$F_i^\\ast  = \\begin{cases} F_i - 0.5 & \\text{ if } F_i > E_i \\\ F_i + 0.5 & \\text{ if } F_i < E_i \\\ F_i & \\text{ if } F_i = E_i \\end{cases}$$
+    $$F_i^\\ast  = \\begin{cases} F_i - 0.5 & \\text{ if } F_i > E_i \\\\ F_i + 0.5 & \\text{ if } F_i < E_i \\\\ F_i & \\text{ if } F_i = E_i \\end{cases}$$
     $$MG_Y=2\\times\\sum_{i=1}^{k}\\left(F_i^\\ast\\times ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right)\\right)$$
     Where if \\(F_i^\\ast = 0\\) then \\(F_i^\\ast\\times ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right) = 0\\).
     
@@ -84,16 +91,40 @@ def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     ---------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> ts_mod_log_likelihood_gof(data)
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> ts_mod_log_likelihood_gof(ex1)
+          n  k    statistic  df        p-value  minExp  percBelow5                 test used
+    0  1941  5  1267.103367   4  4.513015e-273   388.2         0.0  mod-log likelihood ratio
+    
+    Example 2: pandas series with various settings
+    >>> ex2 = df1['mar1']
     >>> eCounts = pd.DataFrame({'category' : ["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED"], 'count' : [5,5,5,5]})
-    >>> ts_mod_log_likelihood_gof(data['marital'], eCounts)
+    >>> ts_mod_log_likelihood_gof(ex2, expCounts=eCounts, cc="yates")
+          n  k    statistic  df        p-value  minExp  percBelow5                                       test used
+    0  1760  4  1198.001863   3  1.989443e-259     440         0.0  mod-log likelihood ratio, and Yates correction
+    >>> ts_mod_log_likelihood_gof(ex2, expCounts=eCounts, cc="pearson")
+          n  k    statistic  df        p-value  minExp  percBelow5                                         test used
+    0  1760  4  1204.929512   3  6.246861e-261     440         0.0  mod-log likelihood ratio, and Pearson correction
+    >>> ts_mod_log_likelihood_gof(ex2, expCounts=eCounts, cc="williams")
+          n  k   statistic  df        p-value  minExp  percBelow5                                          test used
+    0  1760  4  1205.04395   3  5.899735e-261     440         0.0  mod-log likelihood ratio, and Williams correction
+    
+    Example 3: a list
+    >>> ex3 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> ts_mod_log_likelihood_gof(ex3)
+        n  k  statistic  df   p-value  minExp  percBelow5                 test used
+    0  19  4   3.946939   3  0.267251    4.75       100.0  mod-log likelihood ratio
     
     '''
     
@@ -112,7 +143,27 @@ def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
     if expCounts is None:
         expCounts = [sum(freqs)/len(freqs)]* k
         expCounts = pd.Series(expCounts, index=list(freqs.index.values))
+    
+    else:
+        #if expected counts are provided
+        ne = 0
+        k = len(expCounts)
+        #determine sample size of expected counts
+        for i in range(0,k):
+            ne = ne + expCounts.iloc[i,1]
 
+        #remove categories not provided from observed counts
+        for i in freqs.index:
+            if i not in list(expCounts.iloc[:,0]):
+                freqs = freqs.drop(i)
+
+        #adjust based on observed count total
+        n = sum(freqs)
+        for i in range(0,k):
+            expCounts.iloc[i,1] = expCounts.iloc[i,1]/ne * n
+        
+        expCounts = pd.Series(expCounts.iloc[:, 1])
+        
     n = sum(freqs)
     df = k - 1
 
@@ -135,7 +186,7 @@ def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
         testUsed = testUsed + ", and Yates correction"
     
     #determine the test statistic
-    ts = 2*sum(expCounts*np.log(expCounts/freqs))
+    ts = 2*sum(expCounts*np.log(expCounts/list(freqs)))
     
     #set E.S. Pearson correction
     if cc=="pearson":
@@ -159,7 +210,7 @@ def ts_mod_log_likelihood_gof(data, expCounts=None, cc=None):
     minExp = min(expCounts)
     
     #prepare results
-    testResults = pd.DataFrame([[ts, df, pVal, minExp, pBelow*100, testUsed]], columns=["statistic", "df", "p-value", "minExp", "percBelow5", "test used"])        
+    testResults = pd.DataFrame([[n, k, ts, df, pVal, minExp, pBelow*100, testUsed]], columns=["n", "k","statistic", "df", "p-value", "minExp", "percBelow5", "test used"])        
     pd.set_option('display.max_colwidth', None)
     
     return testResults

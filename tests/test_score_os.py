@@ -3,7 +3,8 @@ from statistics import NormalDist
 
 def ts_score_os(data, codes = None, p0 = 0.5, cc = None):
     '''
-    Single Binary Test - One-sample Score
+    One-sample Score Test
+    ---------------------
      
     A one-sample score test could be used with binary data, to test if the two categories have a significantly different proportion. It is an approximation of a binomial test, by using a standard normal distribution. Since the binomial distribution is discrete while the normal is continuous, a so-called continuity correction can (should?) be applied.
     
@@ -15,14 +16,18 @@ def ts_score_os(data, codes = None, p0 = 0.5, cc = None):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    codes : optional list with the two codes to use, default is first two found
-    p0 : The hypothesized proportion for the first category (default is 0.5)
-    cc : use continuity correction, either None (default), or "yates"
+    data : list or pandas data series 
+        the data
+    codes : list, optional 
+        the two codes to use, default is first two found
+    p0 : float, optional
+        the hypothesized proportion for the first category (default is 0.5)
+    cc : {None, "yates"}, optional
+        use continuity correction. Default is None
         
     Returns
     -------
-    testResults : Pandas dataframe with the test statistic, two-sided significance (p-value) and test used
+    testResults : Pandas dataframe with the sample size, test statistic, two-sided significance (p-value) and test used
    
     Notes
     -----
@@ -37,8 +42,8 @@ def ts_score_os(data, codes = None, p0 = 0.5, cc = None):
     
     Symbols used:
     
-    * \(x\) is the number of successes in the sample
-    * \(p_0\) the expected proportion (i.e. the proportion according to the null hypothesis)
+    * \\(x\\) is the number of successes in the sample
+    * \\(p_0\\) the expected proportion (i.e. the proportion according to the null hypothesis)
         
     If the Yates continuity correction is used the formula changes to (Yates, 1934, p. 222):
     $$z_{Yates} = \\frac{\\left|x - \\mu\\right| - 0.5}{SE}$$
@@ -61,19 +66,43 @@ def ts_score_os(data, codes = None, p0 = 0.5, cc = None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
-    --------
-    >>> dataList = ["Female", "Male", "Male", "Female", "Male", "Male"]
-    >>> data = pd.Series(dataList)
-    >>> codes = ['Female', 'Male']
-    >>> ts_score_os(data, codes)
+    ---------
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: Numeric list
+    >>> ex1 = [1, 1, 2, 1, 2, 1, 2, 1]
+    >>> ts_score_os(ex1)
+       n  statistic  p-value (2-sided)                  test
+    0  8  -0.707107             0.4795  Normal approximation
+    
+    Setting a different hypothesized proportion, and going over different methods to determine two-sided test:
+    >>> ts_score_os(ex1, p0=0.3)
+       n  statistic  p-value (2-sided)                  test
+    0  8  -2.005944           0.044862  Normal approximation
+    >>> ts_score_os(ex1, p0=0.3, cc="yates")
+       n  statistic  p-value (2-sided)                                                   test
+    0  8  -1.620185           0.105193  Normal approximation with Yates continuity correction
+    
+    Example 2: pandas Series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ts_score_os(df1['sex'])
+          n  statistic  p-value (2-sided)                  test
+    0  1974  -4.546506           0.000005  Normal approximation
+    >>> ts_score_os(df1['mar1'], codes=["DIVORCED", "NEVER MARRIED"])
+         n  statistic  p-value (2-sided)                  test
+    0  709  -3.042019            0.00235  Normal approximation
     
     '''
     
+    if type(data) is list:
+        data = pd.Series(data)
+        
     if (codes is None):
         k1 = data[0]
         i = 1
@@ -121,6 +150,6 @@ def ts_score_os(data, codes = None, p0 = 0.5, cc = None):
         testValue = Z
         testUsed = "Normal approximation with Yates continuity correction"
         
-    testResults = pd.DataFrame([[testValue, sig2, testUsed]], columns=["statistic", "p-value (2-sided)", "test"])
+    testResults = pd.DataFrame([[n, testValue, sig2, testUsed]], columns=["n", "statistic", "p-value (2-sided)", "test"])
     
     return (testResults)

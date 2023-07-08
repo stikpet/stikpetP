@@ -4,6 +4,7 @@ from scipy.stats import chi2
 def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     '''
     Freeman-Tukey-Read Test of Goodness-of-Fit
+    ------------------------------------------
     
     A test that can be used with a single nominal variable, to test if the probabilities in all the categories are equal (the null hypothesis). If the test has a p-value below a pre-defined threshold (usually 0.05) the assumption they are all equal in the population will be rejected.
     
@@ -13,21 +14,27 @@ def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     
     Parameters
     ----------
-    data :  list or Pandas data series with the data
-    expCount : optional dataframe with the categories and expected counts 
-    weights : the weights to be used (should sum to 4)
-    cc : optional continuity correction None (default), "yates", "pearson", or "williams"
+    data :  list or pandas data series 
+        the data
+    expCount : pandas dataframe, optional 
+        the categories and expected counts
+    weights : float, optional
+        the weights to be used (should sum to 4). Default is 4/3 and 8/3.
+    cc : {None, "yates", "pearson", "williams"}, optional 
+        which continuity correction to use. Default is None
     
     Returns
     -------
-    testResults : Pandas dataframe with:
+    testResults : pandas dataframe with 
     
-    * *statistic*, the chi-square statistic
-    * *df*, the degrees of freedom
-    * *pValue*, two-sided p-value
+    * *n*, the sample size
+    * *k*, the number of categories
+    * *statistic*, the test statistic (chi-square value)
+    * *df*, degrees of freedom
+    * *p-value*, significance (p-value)
     * *minExp*, the minimum expected count
-    * *propBelow5*, the proportion of expected counts below 5
-    * *testUsed*, a description of the test used
+    * *propBelow5*, the proportion of categories with an expected count below 5
+    * *test*, description of the test used
     
     Notes
     -----
@@ -40,26 +47,27 @@ def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     $$E_i = \\frac{n}{k}$$
     else:
     $$E_i = n\\times\\frac{E_{p_i}}{n_p}$$
-    $$n_p = \\sum_{i=1}^k E_{p_i}}
+    $$n_p = \\sum_{i=1}^k E_{p_i}$$
     
-    The sum of the \(b_i\) should be four, i.e.
+    The sum of the \\(b_i\\) should be four, i.e.
     $$\\sum_{i=0}^x = 4$$
 
     *Symbols used:*
-    * \(k\) the number of categories
-    * \(F_i\) the (absolute) frequency of category i
-    * \(E_i\) the expected frequency of category i
-    * \(E_{p_i}\) the provided expected frequency of category i
-    * \(n\) the sample size, i.e. the sum of all frequencies
-    * \(n_p\) the sum of all provided expected counts
-    * \(\\chi^2\\left(\\dots\\right)\) the chi-square cumulative density function
     
-    The default weights are the ones used by Read \(\\left(\\frac{4}{3}, \\frac{8}{3}\\right)\), which would be the same as using a Cressie-Read power divergence with \(\\lambda = \\frac{1}{2}\)
+    * \\(k\\) the number of categories
+    * \\(F_i\\) the (absolute) frequency of category i
+    * \\(E_i\\) the expected frequency of category i
+    * \\(E_{p_i}\\) the provided expected frequency of category i
+    * \\(n\\) the sample size, i.e. the sum of all frequencies
+    * \\(n_p\\) the sum of all provided expected counts
+    * \\(\\chi^2\\left(\\dots\\right)\\) the chi-square cumulative density function
+    
+    The default weights are the ones used by Read \\(\\left(\\frac{4}{3}, \\frac{8}{3}\\right)\\), which would be the same as using a Cressie-Read power divergence with \\(\\lambda = \\frac{1}{2}\\)
     
     The Yates continuity correction (cc="yates") is calculated using (Yates, 1934, p. 222):
-    $$F_i^\\ast  = \\begin{cases} F_i - 0.5 & \\text{ if } F_i > E_i \\\ F_i + 0.5 & \\text{ if } F_i < E_i \\\\ F_i & \\text{ if } F_i = E_i \\end{cases}$$
+    $$F_i^\\ast  = \\begin{cases} F_i - 0.5 & \\text{ if } F_i > E_i \\\\ F_i + 0.5 & \\text{ if } F_i < E_i \\\\ F_i & \\text{ if } F_i = E_i \\end{cases}$$
     $$MG_Y=2\\times\\sum_{i=1}^{k}\\left(F_i^\\ast\\times ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right)\\right)$$
-    Where if \(F_i^\\ast = 0\) then \(F_i^\\ast\\times ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right) = 0\).
+    Where if \\(F_i^\\ast = 0\\) then \\(F_i^\\ast\\times ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right) = 0\\).
     
     The Pearson correction (cc="pearson") is calculated using (E.S. Pearson, 1947, p. 157):
     $$\\chi_{PP}^2 = \\chi_{P}^{2}\\times\\frac{n - 1}{n}$$
@@ -86,16 +94,41 @@ def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     ---------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> ts_freeman_tukey_read(data)
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> ts_freeman_tukey_read(ex1)
+          n  k    statistic  df        p-value  minExp  percBelow5                                   test used
+    0  1941  5  1165.679752   4  4.386839e-251   388.2         0.0  Freeman-Tukey-Read test of goodness-of-fit
+    
+    Example 2: pandas series with various settings
+    >>> ex2 = df1['mar1']
     >>> eCounts = pd.DataFrame({'category' : ["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED"], 'count' : [5,5,5,5]})
-    >>> ts_freeman_tukey_read(data['marital'], eCounts)
+    >>> ts_freeman_tukey_read(ex2, expCounts=eCounts, cc="yates")
+          n  k   statistic  df        p-value  minExp  percBelow5                                                         test used
+    0  1760  4  951.258117   3  6.737047e-206     440         0.0  Freeman-Tukey-Read test of goodness-of-fit, and Yates correction
+    >>> ts_freeman_tukey_read(ex2, expCounts=eCounts, cc="pearson")
+          n  k  statistic  df        p-value  minExp  percBelow5                                                           test used
+    0  1760  4  953.25383   3  2.486337e-206     440         0.0  Freeman-Tukey-Read test of goodness-of-fit, and Pearson correction
+    
+    >>> ts_freeman_tukey_read(ex2, expCounts=eCounts, cc="williams")
+          n  k   statistic  df        p-value  minExp  percBelow5                                                            test used
+    0  1760  4  953.344365   3  2.376409e-206     440         0.0  Freeman-Tukey-Read test of goodness-of-fit, and Williams correction
+    
+    Example 3: a list
+    >>> ex3 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> ts_freeman_tukey_read(ex3)
+        n  k  statistic  df   p-value  minExp  percBelow5                                   test used
+    0  19  4   3.225383   3  0.358164    4.75       100.0  Freeman-Tukey-Read test of goodness-of-fit
     
     '''
     
@@ -114,7 +147,27 @@ def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     if expCounts is None:
         expCounts = [sum(freqs)/len(freqs)]* k
         expCounts = pd.Series(expCounts, index=list(freqs.index.values))
+    
+    else:
+        #if expected counts are provided
+        ne = 0
+        k = len(expCounts)
+        #determine sample size of expected counts
+        for i in range(0,k):
+            ne = ne + expCounts.iloc[i,1]
 
+        #remove categories not provided from observed counts
+        for i in freqs.index:
+            if i not in list(expCounts.iloc[:,0]):
+                freqs = freqs.drop(i)
+
+        #adjust based on observed count total
+        n = sum(freqs)
+        for i in range(0,k):
+            expCounts.iloc[i,1] = expCounts.iloc[i,1]/ne * n
+        
+        expCounts = pd.Series(expCounts.iloc[:, 1])
+        
     n = sum(freqs)
     df = k - 1
 
@@ -142,7 +195,7 @@ def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     for i in range(0, k):
         bSum = 0
         for j in range(0, nb):
-            bSum = bSum + weights[j]*(freqs[i]/expCounts[i])**0.5
+            bSum = bSum + weights[j]*((freqs[i]/expCounts[i])**0.5)**j
         
         ts = ts + (freqs[i]**0.5 - expCounts[i]**0.5)**2*bSum            
     
@@ -168,7 +221,7 @@ def ts_freeman_tukey_read(data, expCounts=None, weights=[4/3, 8/3], cc=None):
     minExp = min(expCounts)
     
     #prepare results
-    testResults = pd.DataFrame([[ts, df, pVal, minExp, pBelow*100, testUsed]], columns=["statistic", "df", "p-value", "minExp", "percBelow5", "test used"])        
+    testResults = pd.DataFrame([[n, k, ts, df, pVal, minExp, pBelow*100, testUsed]], columns=["n", "k","statistic", "df", "p-value", "minExp", "percBelow5", "test used"])        
     pd.set_option('display.max_colwidth', None)
     
     return testResults

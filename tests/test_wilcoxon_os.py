@@ -28,7 +28,8 @@ def srf(x,y):
 def ts_wilcoxon_os(data, levels=None, mu = None, ties = True, 
                appr = "wilcoxon", eqMed = "wilcoxon", cc = False):
     '''
-    one-sample Wilcoxon signed rank test
+    One-Sample Wilcoxon Signed Rank Test
+    -------------------------------------
      
     The one-sample Wilcoxon signed rank test is often considered the non-parametric version of a one-sample t-test. It can be used to determine if the median is significantly different from an hypothesized value. It actually doesn't always tests this specifically, but more if the mean rank is significantly different.
     
@@ -38,17 +39,32 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
     
     Parameters
     ----------
-    data : Pandas data series with the data
-    levels : optional dictionary with the categories and numeric value to use
-    mu : optional hypothesized median, otherwise the midrange will be used
-    ties : optional boolean to use a tie correction (default is True)
-    appr : optional method to use for approximation. Either "wilcoxon" (default), "exact" "imanz" or "imant" for Iman's z or t approximation
-    eqMed : optional method to deal with scores equal to mu. Either "wilcoxon" (default), "pratt" or "zsplit"
-    cc : optional boolean to use a continuity correction (default is False)
+    data : list or pandas data series 
+        the data
+    levels : dictionary, optional
+        the categories and numeric value to use
+    mu : float, optional 
+        hypothesized median. Default is the midrange of the data
+    ties : boolean, optional 
+        to use a tie correction. Default is True
+    appr : {"wilcoxon", "exact" "imanz", "imant"}, optional
+        method to use for approximation. Default is "wilcoxon"
+    eqMed : {"wilcoxon", "pratt", "zsplit"}, optional 
+        method to deal with scores equal to mu. Default is "wilcoxon"
+    cc : boolean, optional 
+        use a continuity correction. Default is False
         
     Returns
     -------
-    testResults : Pandas dataframe with the Wilcoxon W, test statistic, degrees of freedom (only applicable for Iman t approximation), significance (p-value) and test used
+    testResults : pandas dataframe with 
+    
+    * "nr", the number of ranks used in calculation
+    * "mu", the median according to the null hypothesis
+    * "W", the Wilcoxon W value
+    * "statistic", the test statistic (z-value)
+    * "df", degrees of freedom (only applicable for Iman t approximation)
+    * "p-value", significance (p-value)
+    * "test", description of the test used
    
     Notes
     -----
@@ -58,14 +74,14 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
     $$W=\\sum_{i=1}^{n_{r}^{+}}r_{i}^{+}$$
     
     With:
-    $$r=\\textup{rank}(|d|)$$
+    $$r=\\text{rank}(|d|)$$
     $$d_{i}=y_{i}-\\theta$$
     
     *Symbols used:*
-    * \(n_{r}^{+}\) is the number of ranks with a positive deviation from the hypothesized median
-    * \(r_{i}^{+}\) the i-th rank of the ranks with a positive deviation from the hypothesized median
-    * \(\\theta\) is the median tested (the hypothesized median).
-    * \(y_i\) is the i-th score of the variable after removing scores that were equal to \(\\theta\)
+    * \\(n_{r}^{+}\\) is the number of ranks with a positive deviation from the hypothesized median
+    * \\(r_{i}^{+}\\) the i-th rank of the ranks with a positive deviation from the hypothesized median
+    * \\(\\theta\\) is the median tested (the hypothesized median).
+    * \\(y_i\\) is the i-th score of the variable after removing scores that were equal to \\(\\theta\\)
     
     If there are no ties, an exact method can be used, using the Sign Rank Distribution. The exact test can be found in Zaiontz (n.d.)
     
@@ -85,9 +101,9 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
     $$A = \\frac{\\sum_{i=1}^k \\left(t_i^3 - t_i\\right)}{48}$$
     
     *Additional symbols used*
-    * \(n_{r}\) is the number of ranks used
-    * \(k\) the number of unique ranks
-    * \(t_i\) the frequency of the i-th unique rank
+    * \\(n_{r}\\) is the number of ranks used
+    * \\(k\\) the number of unique ranks
+    * \\(t_i\\) the frequency of the i-th unique rank
     
     A Yates continuity correction can simply be applied: 
     In case of no ties (appr="wilcoxon", ties=FALSE, cc=TRUE):
@@ -108,17 +124,17 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
     
     Iman (1974, p. 803) also provides a combination of the t-approximation and the regular z-approximation. The equation is given by (appr="imanz"):
     $$Z_{I} = \\frac{Z}{2}\\times\\left(1 + \\sqrt{\\frac{n_r - 1}{n_r - Z^2}}\\right)$$
-    The \(Z\) is any of the previous methods.
+    The \\(Z\\) is any of the previous methods.
     
     **Ties with mu**
     
     The default (eqMed="wilcoxon") removes first any scores that are equal to the hypothesized median. There are two alternative methods for this.Both re-define \\eqn{d_i} to:
     $$d_i = x_i - \\theta$$
-    Where \(x_i\) is simply the i-th score.
+    Where \\(x_i\\) is simply the i-th score.
     
     For the z-split method we only need to re-define:
     $$W = \\frac{\\sum_{i=1}^{n_{d_0}}r_{i,0}}{2} + \\sum_{i=1}^{n_{r}^{+}}r_{i}^{+}$$
-    Where \(n_{d_0}\) is the number of scores that equal the hypothesized median, and \(r_{i,0}\) is the rank of the i-th score that equals the hypothesized median.
+    Where \\(n_{d_0}\\) is the number of scores that equal the hypothesized median, and \\(r_{i,0}\\) is the rank of the i-th score that equals the hypothesized median.
     
     In essence we added half the sum of the ranks that were equal to the hypothesized median.
     
@@ -130,7 +146,7 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
     
     For the Pratt method, the ties correction still excludes the ties for the scores that equal the hypothesized median, but for the z-split method it will include them.
     
-    For both methods now \(n_r=n\), where n is the number of scores.
+    For both methods now \\(n_r=n\\), where n is the number of scores.
     
     The Pratt (1959) method and z-split method were found in Python’s documentation for scipy’s Wilcoxon function (scipy, n.d.). They also refer to Cureton (1967) for the Pratt method.
     
@@ -162,21 +178,34 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
-    --------
-    >>> dataList = [1, 2, 5, 1, 1, 5, 3, 1, 5, 1, 1, 5, 1, 1, 3, 3, 3, 4, 2, 4]
-    >>> data = pd.Series(dataList)
-    >>> ts_wilcoxon_os(data)
-    >>> ts_wilcoxon_os(data, ties=False, appr="imanz", eqMed = "zsplit", cc = False)
-    >>> dataList2 = [1,2,5,6,8,9,12,13,17,19]
-    >>> data2 = pd.Series(dataList2)
-    >>> ts_wilcoxon_os(data2, mu= 8.1, appr="exact")
+    ---------
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: pandas series
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Teach_Motivate']
+    >>> order = {"Fully Disagree":1, "Disagree":2, "Neither disagree nor agree":3, "Agree":4, "Fully agree":5}
+    >>> ts_wilcoxon_os(ex1, levels=order)
+       nr   mu      W  statistic    df   p-value                                                        test
+    0  42  3.0  236.5   2.788301  n.a.  0.005299  one-sample Wilcoxon signed rank test, with ties correction
+
+    Example 2: Numeric data
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> ts_wilcoxon_os(ex2)
+       nr   mu     W  statistic    df   p-value                                                        test
+    0  16  3.0  91.0   1.231162  n.a.  0.218262  one-sample Wilcoxon signed rank test, with ties correction
 
     '''
+    
+    if type(data) is list:
+        data = pd.Series(data)
+    
     #remove missing values
     data = data.dropna()
     if levels is not None:
@@ -285,7 +314,7 @@ def ts_wilcoxon_os(data, levels=None, mu = None, ties = True,
         elif (eqMed == "zsplit"):
             testUsed = ", ".join([testUsed, "z-split method for equal to hyp. med."])
 
-    testResults = pd.DataFrame([[mu, W, statistic, df, pVal, testUsed]], columns=["mu", "W", "statistic", "df", "p-value", "test"])
+    testResults = pd.DataFrame([[nr, mu, W, statistic, df, pVal, testUsed]], columns=["nr", "mu", "W", "statistic", "df", "p-value", "test"])
     pd.set_option('display.max_colwidth', None)
     
     return testResults

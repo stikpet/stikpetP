@@ -2,9 +2,10 @@ from math import log
 import pandas as pd
 from scipy.stats import chi2
 
-def ts_g_gof(data, expCount=None, cc=None):
+def ts_g_gof(data, expCounts=None, cc=None):
     '''
     G (Likelihood Ratio) Goodness-of-Fit Test
+    ------------------------------------------
      
     A test that can be used with a single nominal variable, to test if the probabilities in all the categories are equal (the null hypothesis). If the test has a p-value below a pre-defined threshold (usually 0.05) the assumption they are all equal in the population will be rejected. 
     
@@ -12,20 +13,25 @@ def ts_g_gof(data, expCount=None, cc=None):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    expCount : Optional Pandas data frame with categories and expected counts
-    cc : Optional which continuity correction to use, either None (default), "yates", "pearson", or "williams"
+    data :  list or pandas data series 
+        the data
+    expCounts : pandas dataframe, optional 
+        the categories and expected counts
+    cc : {None, "yates", "pearson", "williams"}, optional 
+        which continuity correction to use. Default is None
         
     Returns
     -------
-    Pandas Dataframe with:
+    testResults : pandas dataframe with 
     
-    * *statistic*, the chi-square statistic
-    * *df*, the degrees of freedom
-    * *pValue*, two-sided p-value
+    * *n*, the sample size
+    * *k*, the number of categories
+    * *statistic*, the test statistic (chi-square value)
+    * *df*, degrees of freedom
+    * *p-value*, significance (p-value)
     * *minExp*, the minimum expected count
-    * *propBelow5*, the proportion of expected counts below 5
-    * *testUsed*, a description of the test used
+    * *propBelow5*, the proportion of categories with an expected count below 5
+    * *test*, description of the test used
    
     Notes
     -----
@@ -46,21 +52,22 @@ def ts_g_gof(data, expCount=None, cc=None):
     $$n_p = \\sum_{i=1}^k E_{p_i}$$
     
     *Symbols used*:
-    * \(k\) the number of categories
-    * \(F_i\) the (absolute) frequency of category i
-    * \(E_i\) the expected frequency of category i
-    * \(E_{p_i}\) the provided expected frequency of category i
-    * \(n\) the sample size, i.e. the sum of all frequencies
-    * \(n_p\) the sum of all provided expected counts
-    * \(\\chi^2\\left(\\dots\\right)\) the chi-square cumulative density function
+    
+    * \\(k\\) the number of categories
+    * \\(F_i\\) the (absolute) frequency of category i
+    * \\(E_i\\) the expected frequency of category i
+    * \\(E_{p_i}\\) the provided expected frequency of category i
+    * \\(n\\) the sample size, i.e. the sum of all frequencies
+    * \\(n_p\\) the sum of all provided expected counts
+    * \\(\\chi^2\\left(\\dots\\right)\\) the chi-square cumulative density function
     
     The term ‘Likelihood Ratio Goodness-of-Fit’ can for example be found in an article from Quine and Robinson (1985), the term ‘Wilks’s likelihood ratio test’ can also be found in Li and Babu (2019, p. 331), while the term G-test is found in Hoey (2012, p. 4)
     
     The Yates continuity correction (cc="yates") is calculated using (Yates, 1934, p. 222):
-    $$F_i^\\ast  = \\begin{cases} F_i - 0.5 & \\text{ if } F_i > E_i \\\ F_i + 0.5 & \\text{ if } F_i < E_i \\\ F_i & \\text{ if } F_i = E_i \\end{cases}$$
+    $$F_i^\\ast  = \\begin{cases} F_i - 0.5 & \\text{ if } F_i > E_i \\\\ F_i + 0.5 & \\text{ if } F_i < E_i \\\\ F_i & \\text{ if } F_i = E_i \\end{cases}$$
     $$G_Y=2\\times\\sum_{i=1}^{k}\\left(F_i^\\ast\\times ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right)\\right)$$
     
-    Where if \(F_i^\\ast = 0\) then \(F_i^\\ast\\times \\ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right) = 0\)
+    Where if \\(F_i^\\ast = 0\\) then \\(F_i^\\ast\\times \\ln\\left(\\frac{F_i^\\ast}{E_{i}}\\right) = 0\\)
     
     The Pearson correction (cc="pearson") is calculated using (E.S. Pearson, 1947, p. 157):
     $$G_{P} = G\\times\\frac{n - 1}{n}$$
@@ -94,17 +101,40 @@ def ts_g_gof(data, expCount=None, cc=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
-    --------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> ts_g_gof(data['marital'])
+    ---------
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> ts_g_gof(ex1)
+          n  k    statistic  df        p-value  minExp  propBelow5                       test
+    0  1941  5  1137.011676   4  7.187038e-245   388.2         0.0  G test of goodness-of-fit
+    
+    Example 2: pandas series with various settings
+    >>> ex2 = df1['mar1']
     >>> eCounts = pd.DataFrame({'category' : ["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED"], 'count' : [5,5,5,5]})
-    >>> ts_g_gof(data['marital'], eCounts)
-    >>> ts_g_gof(data['marital'], cc="pearson")
+    >>> ts_g_gof(ex2, expCounts=eCounts, cc="yates")
+          n  k  statistic  df        p-value  minExp  propBelow5                                                         test
+    0  1760  4  971.38162   3  2.905646e-210   440.0         0.0  G test of goodness-of-fit, with Yates continuity correction
+    >>> ts_g_gof(ex2, expCounts=eCounts, cc="pearson")
+          n  k   statistic  df        p-value  minExp  propBelow5                                                              test
+    0  1760  4  971.779494   3  2.381959e-210   440.0         0.0  G test of goodness-of-fit, with E. Pearson continuity correction
+    >>> ts_g_gof(ex2, expCounts=eCounts, cc="williams")
+          n  k   statistic  df        p-value  minExp  propBelow5                                                            test
+    0  1760  4  972.178518   3  1.951534e-210   440.0         0.0  G test of goodness-of-fit, with Williams continuity correction
+    
+    Example 3: a list
+    >>> ex3 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> ts_g_gof(ex3)
+        n  k  statistic  df   p-value  minExp  propBelow5                       test
+    0  19  4   3.397304   3  0.334328    4.75         1.0  G test of goodness-of-fit
     
     '''
     
@@ -113,7 +143,7 @@ def ts_g_gof(data, expCount=None, cc=None):
     
     #determine the observed counts
     
-    if expCount is None:
+    if expCounts is None:
         #generate frequency table
         freq = data.value_counts()
         n = sum(freq)
@@ -129,15 +159,15 @@ def ts_g_gof(data, expCount=None, cc=None):
         #if expected counts are given
         
         #number of categories to use (k)
-        k = len(expCount)
+        k = len(expCounts)
         
         freq = pd.DataFrame(columns = ["category", "count"])
         for i in range(0, k):
-            nk = data[data==expCount.iloc[i, 0]].count()
-            lk = expCount.iloc[i, 0]
+            nk = data[data==expCounts.iloc[i, 0]].count()
+            lk = expCounts.iloc[i, 0]
             freq = pd.concat([freq, pd.DataFrame([{"category": lk, "count": nk}])])
         
-        nE = sum(expCount.iloc[:,1])
+        nE = sum(expCounts.iloc[:,1])
         
         freq = freq.reset_index(drop=True)
     
@@ -147,7 +177,7 @@ def ts_g_gof(data, expCount=None, cc=None):
     df = k - 1
     
     #the true expected counts
-    if expCount is None:
+    if expCounts is None:
         #assume all to be equal
         expC = [n/k] * k
         
@@ -155,7 +185,7 @@ def ts_g_gof(data, expCount=None, cc=None):
         #check if categories match
         expC = []
         for i in range(0,k):
-            expC.append(expCount.iloc[i, 1]/nE*n)
+            expC.append(expCounts.iloc[i, 1]/nE*n)
             
     #calculate the chi-square value
     chiVal = 0
@@ -192,7 +222,7 @@ def ts_g_gof(data, expCount=None, cc=None):
     elif not (cc is None) and cc == "yates":
         testUsed = testUsed + ", with Yates continuity correction"
     
-    testResults = pd.DataFrame([[chiVal, df, pVal, minExp, propBelow5, testUsed]], columns=["statistic", "df", "p-value", "minExp", "propBelow5", "test"])
+    testResults = pd.DataFrame([[n, k, chiVal, df, pVal, minExp, propBelow5, testUsed]], columns=["n", "k","statistic", "df", "p-value", "minExp", "propBelow5", "test"])
     pd.set_option('display.max_colwidth', None)
     
     return testResults

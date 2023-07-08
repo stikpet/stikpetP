@@ -3,7 +3,8 @@ from statistics import NormalDist
 
 def ts_wald_os(data, codes=None, p0 = 0.5, cc = None):
     '''
-    Single Binary Test - One-sample Wald
+    One-sample Wald Test
+    --------------------
      
     A one-sample score test could be used with binary data, to test if the two categories have a significantly different proportion. It is an approximation of a binomial test, by using a standard normal distribution. Since the binomial distribution is discrete while the normal is continuous, a so-called continuity correction can (should?) be applied.
     
@@ -17,14 +18,23 @@ def ts_wald_os(data, codes=None, p0 = 0.5, cc = None):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    codes : list with the two codes to use
-    p0 : The hypothesized proportion for the first category (default is 0.5)
-    cc : use continuity correction, either None (default), or "yates"
+    data : list or pandas data series 
+        the data
+    codes : list, optional 
+        the two codes to use. Default will use the first two found
+    p0 : float, optional
+        the hypothesized proportion for the first category. Default is 0.5
+    cc : {None, "yates"}, optional
+        continuity correction to use. Default is None
         
     Returns
     -------
-    testResults : Pandas dataframe with the test statistic, two-sided significance (p-value) and test used
+    testResults : pandas dataframe with 
+    
+    * *n*, the sample size
+    * *statistic*, test statistic (z-value)
+    * *p-value (2-sided)*, two-sided significance (p-value)
+    * *test*, test used
    
     Notes
     -----
@@ -39,8 +49,8 @@ def ts_wald_os(data, codes=None, p0 = 0.5, cc = None):
     
     *Symbols used:*
     
-    * \(x\) is the number of successes in the sample
-    * \(p_0\) the expected proportion (i.e. the proportion according to the null hypothesis)
+    * \\(x\\) is the number of successes in the sample
+    * \\(p_0\\) the expected proportion (i.e. the proportion according to the null hypothesis)
     
     If the Yates continuity correction is used the formula changes to (Yates, 1934, p. 222):
     $$z_{Yates} = \\frac{\\left|x - \\mu\\right| - 0.5}{SE}$$
@@ -61,18 +71,41 @@ def ts_wald_os(data, codes=None, p0 = 0.5, cc = None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
-    -------
-    >>> dataList = ["Female", "Male", "Male", "Female", "Male", "Male"]
-    >>> data = pd.Series(dataList)
-    >>> ts_wald_os(data, codes)
+    ---------
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: Numeric list
+    >>> ex1 = [1, 1, 2, 1, 2, 1, 2, 1]
+    >>> ts_wald_os(ex1)
+       n  statistic  p-value (2-sided)                test
+    0  8  -0.730297           0.465209  Wald approximation
+    >>> ts_wald_os(ex1, p0=0.3)
+       n  statistic  p-value (2-sided)                test
+    0  8  -1.898772           0.057595  Wald approximation
+    >>> ts_wald_os(ex1, p0=0.3, cc="yates")
+       n  statistic  p-value (2-sided)                                                 test
+    0  8  -1.496663           0.134481  Wald approximation with Yates continuity correction
+    
+    Example 2: pandas Series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ts_wald_os(df1['sex'])
+          n  statistic  p-value (2-sided)                test
+    0  1974  -4.570499           0.000005  Wald approximation
+    >>> ts_wald_os(df1['mar1'], codes=["DIVORCED", "NEVER MARRIED"])
+         n  statistic  p-value (2-sided)                test
+    0  709  -3.062068           0.002198  Wald approximation
     
     '''
     
+    if type(data) is list:
+        data = pd.Series(data)
+        
     nrows = len(data)
     
     if codes is None:
@@ -122,7 +155,7 @@ def ts_wald_os(data, codes=None, p0 = 0.5, cc = None):
         testValue = Z
         testUsed = "Wald approximation with Yates continuity correction"
         
-    testResults = pd.DataFrame([[testValue, sig2, testUsed]], columns=["statistic", "p-value (2-sided)", "test"])
+    testResults = pd.DataFrame([[n, testValue, sig2, testUsed]], columns=["n", "statistic", "p-value (2-sided)", "test"])
     
     return (testResults)
 

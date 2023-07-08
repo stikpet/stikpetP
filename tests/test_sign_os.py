@@ -3,19 +3,26 @@ from scipy.stats import binom
 
 def ts_sign_os(data, levels=None, mu = None):
     '''
-    one-sample sign test
+    One-Sample Sign Test
+    --------------------
      
     This function will perform one-sample sign test.
     
     Parameters
     ----------
-    data : pandas data series with the data
-    levels : optional dictionary with the categories and numeric value to use
-    mu : optional hypothesized median, otherwise the midrange will be used
+    data : list or pandas data series 
+        the data
+    levels : dictionary, optional 
+        the categories and numeric value to use
+    mu : float, optional 
+        hypothesized median. Default is the midrange of the data
         
     Returns
     -------
-    testResults : Pandas dataframe with the significance (p-value) and test used
+    testResults : pandas dataframe with 
+    
+    * *p-value*, the significance (p-value) 
+    * *test*, description of the test used
    
     Notes
     -----
@@ -25,11 +32,12 @@ def ts_sign_os(data, levels=None, mu = None):
     $$p = 2\\times B\\left(n, \\text{min}\\left(n_+, n_-\\right), \\frac{1}{2}\\right)$$
     
     *Symbols used:*
-    * \(B\\left(\\dots\\right)\) is the binomial cumulative distribution function
-    * \(n\) is the number of cases
-    * \(n_+\) is the number of cases above the hypothesized median
-    * \(n_-\) is the number of cases below the hypothesized median
-    * \(min\) is the minimum value of the two values
+    
+    * \\(B\\left(\\dots\\right)\\) is the binomial cumulative distribution function
+    * \\(n\\) is the number of cases
+    * \\(n_+\\) is the number of cases above the hypothesized median
+    * \\(n_-\\) is the number of cases below the hypothesized median
+    * \\(min\\) is the minimum value of the two values
     
     The test is described in Stewart (1941), although there are earlier uses. The paired version for example was already described by Arbuthnott (1710)
     
@@ -43,18 +51,33 @@ def ts_sign_os(data, levels=None, mu = None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
-    --------
-    >>> dataList = [1, 2, 5, 1, 1, 5, 3, 1, 5, 1, 1, 5, 1, 1, 3, 3, 3, 4, 2, 4]
-    >>> data = pd.Series(dataList)
-    >>> ts_sign_os(data)
-    >>> ts_sign_os(data, hypMed=2)
+    ---------
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
+    
+    Example 1: pandas series
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Teach_Motivate']
+    >>> order = {"Fully Disagree":1, "Disagree":2, "Neither disagree nor agree":3, "Agree":4, "Fully agree":5}
+    >>> ts_sign_os(ex1, levels=order)
+       p-value                  test
+    0  0.01952  one-sample sign test
+    
+    Example 2: Numeric data
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> ts_sign_os(ex2)
+        p-value                  test
+    0  0.454498  one-sample sign test
     
     '''
+    if type(data) is list:
+        data = pd.Series(data)
+    
     #remove missing values
     data = data.dropna()
     if levels is not None:

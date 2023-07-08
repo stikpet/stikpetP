@@ -3,9 +3,10 @@ import pandas as pd
 import numpy as np
 from scipy.stats import multinomial
 
-def ts_multinomial_gof(data, expCount=None):
+def ts_multinomial_gof(data, expCounts=None):
     '''
     Multinomial Goodness-of-Fit Test
+    --------------------------------
      
     A test that can be used with a single nominal variable, to test if the probabilities in all the categories are equal (the null hypothesis). If the test has a p-value below a pre-defined threshold (usually 0.05) the assumption they are all equal in the population will be rejected. 
     
@@ -15,8 +16,9 @@ def ts_multinomial_gof(data, expCount=None):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    expCount : optional Pandas data frame with categories and expected counts
+    data : list or pandas data series
+    expCounts : pandas data frame, optional 
+        the categories and expected counts
         
     Returns
     -------
@@ -44,17 +46,35 @@ def ts_multinomial_gof(data, expCount=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     ---------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> ts_multinomial_gof(data)
-    >>> eCounts = pd.DataFrame({'category' : ["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED"], 'count' : [5,5,5,5]})
-    >>> ts_multinomial_gof(data['marital'], eCounts)
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
     
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1'][0:20]
+    >>> ts_multinomial_gof(ex1)
+        p obs.  n combs.   p-value                                               test
+    0  0.00022      8855  0.199807  one-sample multinomial exact goodness-of-fit test
+    
+    Example 2: pandas series with various settings
+    >>> ex2 = df1['mar1'][0:20]
+    >>> eCounts = pd.DataFrame({'category' : ["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED"], 'count' : [5,5,5,5]})
+    >>> ts_multinomial_gof(ex2, expCounts=eCounts)
+         p obs.  n combs.   p-value                                               test
+    0  0.003209      1330  0.390236  one-sample multinomial exact goodness-of-fit test
+    
+    Example 3: a list
+    >>> ex3 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> ts_multinomial_gof(ex3)
+         p obs.  n combs.   p-value                                               test
+    0  0.002541      1540  0.388712  one-sample multinomial exact goodness-of-fit test
+
     '''
     
     if type(data) == list:
@@ -62,7 +82,7 @@ def ts_multinomial_gof(data, expCount=None):
         
     #determine the observed counts
     
-    if expCount is None:
+    if expCounts is None:
         #generate frequency table
         freq = data.value_counts()
         n = sum(freq)
@@ -77,21 +97,21 @@ def ts_multinomial_gof(data, expCount=None):
         #if expected counts are given
         
         #number of categories to use (k)
-        k = len(expCount)
+        k = len(expCounts)
         
         freq = pd.DataFrame(columns = ["category", "count"])
         for i in range(0, k):
-            nk = data[data==expCount.iloc[i, 0]].count()
-            lk = expCount.iloc[i, 0]
+            nk = data[data==expCounts.iloc[i, 0]].count()
+            lk = expCounts.iloc[i, 0]
             freq = pd.concat([freq, pd.DataFrame([{"category": lk, "count": nk}])])
-        nE = sum(expCount.iloc[:,1])
+        nE = sum(expCounts.iloc[:,1])
             
         freq = freq.reset_index(drop=True)
             
     n = sum(freq["count"])
     
     #the true expected counts
-    if expCount is None:
+    if expCounts is None:
         #assume all to be equal
         exp_prop = [1/k] * k
         
@@ -99,7 +119,7 @@ def ts_multinomial_gof(data, expCount=None):
         #check if categories match
         exp_prop = []
         for i in range(0,k):
-            exp_prop.append(expCount.iloc[i, 1]/nE)
+            exp_prop.append(expCounts.iloc[i, 1]/nE)
     
     observed = freq.iloc[:,1]
     p_obs = multinomial.pmf(x=np.sort(observed), n=n, p=exp_prop)

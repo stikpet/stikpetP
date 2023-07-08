@@ -3,7 +3,8 @@ import pandas as pd
 
 def ts_z_os(data, mu=None, sigma=None):
     '''
-    One-Sample Z t-Test
+    One-Sample Z Test
+    -----------------
     
     This test is often used if there is a large sample size. For smaller sample sizes, a Student t-test
     is usually used.
@@ -12,11 +13,14 @@ def ts_z_os(data, mu=None, sigma=None):
     (arithmetic) mean that is expected in the population. If the p-value (significance) is then below a 
     pre-defined threhold (usually 0.05), the assumption is rejected.
     
-    Paramaters
+    Parameters
     ----------
-    data : a pandas data series with the data as numbers
-    mu : optional hypothesized mean, otherwise the midrange will be used
-    sigma : optional population standard deviation, if not set the sample results will be used
+    data : list or pandas data series
+        the data as numbers
+    mu : float, optional
+        hypothesized mean, otherwise the midrange will be used
+    sigma : float, optional 
+        population standard deviation, if not set the sample results will be used
     
     Returns
     -------
@@ -41,23 +45,47 @@ def ts_z_os(data, mu=None, sigma=None):
     
     *Symbols used:*
     
-    * \(\\Phi\\left(\\dots\\right)\) the cumulative distribution function of the standard normal distribution
-    * \(\\bar{x}\) the sample mean
-    * \(\\mu_{H_0}\) the hypothesized mean in the population
-    * \(SE\) the standard error (i.e. the standard deviation of the sampling distribution)
-    * \(n\) the sample size (i.e. the number of scores)
-    * \(s\) the unbiased sample standard deviation
-    * \(x_i\) the i-th score
+    * \\(\\Phi\\left(\\dots\\right)\\) the cumulative distribution function of the standard normal distribution
+    * \\(\\bar{x}\\) the sample mean
+    * \\(\\mu_{H_0}\\) the hypothesized mean in the population
+    * \\(SE\\) the standard error (i.e. the standard deviation of the sampling distribution)
+    * \\(n\\) the sample size (i.e. the number of scores)
+    * \\(s\\) the unbiased sample standard deviation
+    * \\(x_i\\) the i-th score
     
     Author
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet
+    Examples
+    ---------
+    >>> pd.set_option('display.width',1000)
+    >>> pd.set_option('display.max_columns', 1000)
     
+    Example 1: pandas series
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Gen_Age']
+    >>> ts_z_os(ex1)
+         mu  sample mean  statistic  p-value     test used
+    0  68.5    24.454545 -19.291196      0.0  one-sample z
+    >>> ts_z_os(ex1, mu=22, sigma=12.1)
+       mu  sample mean  statistic   p-value     test used
+    0  22    24.454545   1.345588  0.178435  one-sample z
+    
+    Example 2: Numeric list
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> ts_z_os(ex2)
+        mu  sample mean  statistic   p-value     test used
+    0  3.0     3.444444    1.19335  0.232732  one-sample z
+
     '''
+    if type(data) is list:
+        data = pd.Series(data)
+        
     data = data.dropna()
     
     if (mu is None):
