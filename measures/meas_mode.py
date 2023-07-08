@@ -4,6 +4,7 @@ import numpy as np
 def me_mode(data, allEq="none"):
     '''
     Mode
+    ----
     
     The mode is a measure of central tendency and defined as “the abscissa corresponding to the ordinate of maximum 
     frequency” (Pearson, 1895, p. 345). A more modern definition would be “the most common value obtained in a set 
@@ -24,8 +25,10 @@ def me_mode(data, allEq="none"):
     
     Parameters
     ----------
-    data : pandas series with the scores to determine the mode from
-    allEq : optional indicator on what to do if maximum frequency is equal for more than one category (see notes)
+    data : list or pandas series 
+        the scores to determine the mode from
+    allEq : {"none", "all"}, optional 
+        indicator on what to do if maximum frequency is equal for more than one category. Default is "none".
     
     Returns
     -------
@@ -43,6 +46,10 @@ def me_mode(data, allEq="none"):
     On a rare occasion someone might argue that if all categories have the same frequency, then all categories are 
     part of the mode since they all have the highest frequency. This is used when *allEq="all"*.
     
+    See Also
+    --------
+    stikpetP.measures.meas_mode_bin.me_mode_bin : to determine the mode with binned data
+    
     References
     ----------
     Larson, R., & Farber, E. (2014). *Elementary statistics: Picturing the world* (6th ed.). Pearson.
@@ -57,16 +64,51 @@ def me_mode(data, allEq="none"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> me_mode(data['marital'])
+    Example 1: pandas series
+    >>> import pandas as pd
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> me_mode(ex1)
+            mode  mode freq.
+    0  [MARRIED]         972
     
+    Example 2: a list
+    >>> ex2 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> me_mode(ex2)
+             mode  mode freq.
+    0  [DIVORCED]           7
+    
+    Example 3: Multi-Mode
+    >>> ex3a = [1, 1, 2, 3, 3, 4, 5, 6, 6]
+    >>> me_mode(ex3a)
+                  mode  mode freq.
+    0  [1.0, 3.0, 6.0]           2
+    >>> ex3b = ["MARRIED", "DIVORCED", "MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED"]
+    >>> me_mode(ex3b)
+                      mode  mode freq.
+    0  [MARRIED, DIVORCED]           3
+
+    Example 4: All Equal
+    >>> ex4a = [1, 1, 2, 2, 3, 3, 6, 6]
+    >>> me_mode(ex4a)
+            mode mode freq.
+    0  [no mode]         na
+    >>> ex4b = [1, 1, 2, 2, 3, 3, 6, 6]
+    >>> me_mode(ex4b, allEq="all")
+                       mode  mode freq.
+    0  [1.0, 2.0, 3.0, 6.0]           2
+        
     '''
+    
+    if type(data) == list:
+        data = pd.Series(data)
+    
     freq = data.value_counts()
     maxCount = freq.max()
     modes = []

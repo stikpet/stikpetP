@@ -3,15 +3,16 @@ import pandas as pd
 def me_variation_ratio(data):
     '''
     Variation Ratio
+    ---------------
     
     the Variation Ratio (VR) (Freeman, 1965) is simply the proportion that does not belong to the modal category (Zedeck, 2014, p.406). 
     
-    It is a measure of dispersion for categorical data. There are many other measures of dispersion for categorical data. 
-    A good start for more info on other measures could be an article from Kader and Perry (2007).
+    It is a measure of dispersion for categorical data. There are many other measures of dispersion for categorical data. A good start for more info on other measures could be an article from Kader and Perry (2007).
     
     Parameters
     ----------
-    data : the scores from which to determine the variation ratio
+    data : list or pandas series
+        the scores from which to determine the variation ratio
     
     Returns
     -------
@@ -27,9 +28,9 @@ def me_variation_ratio(data):
     
     *Symbols used:*
     
-    * \(n\) the total sample size
-    * \(k_m\) the number of categories with a frequency equal to \eqn{F_{mode}}
-    * \(F_{m}\) the frequency (count) of the modal category (categories)
+    * \\(n\\) the total sample size
+    * \\(k_m\\) the number of categories with a frequency equal to \\(F_{mode}\\)
+    * \\(F_{m}\\) the frequency (count) of the modal category (categories)
     
     References 
     ----------
@@ -41,16 +42,29 @@ def me_variation_ratio(data):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> me_variation_ratio(data['marital'])    
+    Example 1: pandas series
+    >>> import pandas as pd
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'}) 
+    >>> ex1 = df1['mar1']
+    >>> me_variation_ratio(ex1)
+    0.49922720247295205
+    
+    Example 2: a list
+    >>> ex2 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> me_variation_ratio(ex2)
+    0.631578947368421
     
     '''
+    
+    if type(data) == list:
+        data = pd.Series(data)
+    
     freq = data.value_counts()
     maxFreq = freq.max()
     n = freq.sum()

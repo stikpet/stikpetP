@@ -1,23 +1,30 @@
 import math
 from numpy import log
+import pandas as pd
 
 def me_mean(data, version="arithmetic", trimProp=0.1, trimFrac="down"):
     '''
     Mean
+    ----
     
     Different types of means can be determined using this function. 
     The mean is a measure of central tendency, to indicate the center.
     
     Parameters
     ----------
-    data : pandas data series with numeric data
-    version : string with mean to calculate. Either "arithmetic" (default), "winsorized", "trimmed", "windsor", "truncated", "winsorized", "olympic", "geometric", "harmonic", "midrange"
-    trimProp : optional parameter to indicate the total proportion to trim. Default at 0.1 i.e. 0.05 from each side.
-    trimFrac : optional parameter to indicate what to do if trimmed amount is non-integer. Either "down" (default), "prop" or "linear"
+    data : list or pandas data series 
+        numeric data
+    version : {"arithmetic", "winsorized", "trimmed", "windsor", "truncated", "olympic", "geometric", "harmonic", "midrange"}, optional
+            mean to calculate. Default is "arithmetic"
+    trimProp : float, optional
+        indicate the total proportion to trim. Default at 0.1 i.e. 0.05 from each side.
+    trimFrac : {"down", "prop", "linear"}, optional 
+        parameter to indicate what to do if trimmed amount is non-integer. Default is "down"
     
     Returns
     -------
-    res : value of the mean
+    res : float
+        value of the mean
     
     Notes
     -----
@@ -34,22 +41,22 @@ def me_mean(data, version="arithmetic", trimProp=0.1, trimFrac="down"):
     **Harmonic Mean**
     
     The second of the three Pythagorean means:
-    $$H = \\frac{n}{\\sum_{i=1}^n \\frac{1}{x_i}}
+    $$H = \\frac{n}{\\sum_{i=1}^n \\frac{1}{x_i}}$$
     
     **Geometric Mean**
     
     The third of the three Pythagorean means:
-    $$G = e^{\\frac{1}{n}\\times\\sum_{i=1}^n \\ln\\left(x_i\\right)}
+    $$G = e^{\\frac{1}{n}\\times\\sum_{i=1}^n \\ln\\left(x_i\\right)}$$
     
     **Olympic Mean**
     
-    Simply ignore the maximum and minimum (only once):
+    Simply ignore the maximum and minimum (only once) (Louis et al., 2023, p. 117):
     $$OM = \\frac{\\sum_{i=2}^{n-1} x_i}{n - 2}$$
     
     **Mid Range**
     
-    The average of the maximum and minimum:
-    $$MR = \\frac{\\min x + \\max x}{2}
+    The average of the maximum and minimum (Lovitt & Holtzclaw, 1931, p. 91):
+    $$MR = \\frac{\\min x + \\max x}{2}$$
     
     **Trimmed**
     
@@ -90,6 +97,10 @@ def me_mean(data, version="arithmetic", trimProp=0.1, trimFrac="down"):
     
     Dixon, W. J. (1960). Simplified estimation from censored normal samples. *The Annals of Mathematical Statistics, 31*(2), 385–391. https://doi.org/10.1214/aoms/1177705900
     
+    Louis, P., Núñez, M., & Xefteris, D. (2023). Trimming extreme reports in preference aggregation. *Games and Economic Behavior, 137*, 116–151. https://doi.org/10.1016/j.geb.2022.11.003
+    
+    Lovitt, W. V., & Holtzclaw, H. F. (1931). *Statistics*. Prentice Hall.
+    
     Tukey, J. W. (1962). The future of data analysis. *The Annals of Mathematical Statistics, 33*(1), 1–67. https://doi.org/10.1214/aoms/1177704711
     
     Weinberg, G. H., & Schumaker, J. A. (1962). *Statistics An intuitive approach*. Wadsworth Publishing.
@@ -98,13 +109,31 @@ def me_mean(data, version="arithmetic", trimProp=0.1, trimFrac="down"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet
+    Examples
+    --------
+    Example 1: Numeric Pandas Series
+    >>> import pandas as pd
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Gen_Age']
+    >>> me_mean(ex1)
+    24.454545454545453
     
+    Example 2: Numeric list
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> me_mean(ex2)
+    3.4444444444444446
+
     '''
-    
-    if version=="artithmetic":
+    if type(data) is list:
+        data = pd.Series(data)
+        
+    data = data.dropna()
+        
+    if version=="arithmetic":
         res = data.mean()
     elif version in ["winsorized", "trimmed", "windsor", "truncated"]:
         data = pd.to_numeric(data)
@@ -124,7 +153,6 @@ def me_mean(data, version="arithmetic", trimProp=0.1, trimFrac="down"):
                 res = data[nl:(n-nl)].mean()
             elif trimFrac=="prop":
                 fr = nt1 - nl
-                print(data[n-nl])
                 res = (data[nl]*(1 - fr) + data[n-nl-1]*(1 - fr) + sum(data[nl+1:(n-nl-1)]))/(n - nt1*2)
             elif trimFrac=="linear":
                 p1 = nl*2/n

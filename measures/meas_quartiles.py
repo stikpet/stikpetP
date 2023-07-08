@@ -7,6 +7,7 @@ from ..helper.help_quartileIndex import he_quartileIndex
 def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="linear", q1Int="int", q3Frac="linear", q3Int="int"):
     '''
     Quartiles / Hinges
+    ------------------
     
     The quartiles are at quarters of the data (McAlister, 1879, p. 374; Galton, 1881, p. 245). The median is at 50%, and the quartiles at 25% and 75%. Note that there are five quartiles, the minimum value is the 0-quartile, at 25% the first (or lower) quartile, at 50% the median a.k.a. the second quartile, at 75% the third (or upper) quartile, and the maximum as the fourth quartile.
     
@@ -16,22 +17,23 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
     
     Parameters
     ----------
-    data : pandas series with
-    levels : optional dictionary with coding to use
-    method : optional which method to use to calculate quartiles.
-    indexMethod : optional to indicate which type of indexing to use
-    q1Frac : optional to indicate what type of rounding to use for first quarter
-    q1Int : optional to indicate the use of the integer or the midpoint method for first quarter
-    q3Frac : optional to indicate what type of rounding to use for third quarter
-    q3Int : optional to indicate the use of the integer or the midpoint method for third quarter
+    data : list or pandas series
+    levels : dictionary, optional 
+        coding to use
+    method : string, optional 
+        which method to use to calculate quartiles
+    indexMethod : {"sas1", "inclusive", "exclusive", "sas4", "excel", "hl", "hf8", "hf9"}, optional 
+        to indicate which type of indexing to use. Default is "sas1"
+    q1Frac : {"linear", "down", "up", "bankers", "nearest", "halfdown", "midpoint"}, optional 
+        to indicate what type of rounding to use for first quarter. Default is "linear"
+    q1Int : {"int", "midpoint"}, optional 
+        to indicate the use of the integer or the midpoint method for first quarter. Default is "int"
+    q3Frac : {"linear", "down", "up", "bankers", "nearest", "halfdown", "midpoint"}, optional 
+        to indicate what type of rounding to use for third quarter. Default is "linear"
+    q3Int : {"int", "midpoint"}, optional  
+        to indicate the use of the integer or the midpoint method for third quarter. Default is "int"
     
     method can be set to "own" and then provide the next parameters, or any of the methods listed in the notes.
-    
-    indexMethod can be set to "inclusive", "exclusive", "sas1", "sas4", "excel", "hl", "hf8", or "hf9".
-    
-    q1Frac and q3Frac can be set to: "linear", "down", "up", "bankers", "nearest", "halfdown", or "midpoint".
-    
-    q1Int and q3Int can be set to: "int" or "midpoint".
     
     Returns
     -------
@@ -144,12 +146,31 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet
+    Examples
+    --------
+    Example 1: Text Pandas Series
+    >>> import pandas as pd
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Teach_Motivate']
+    >>> order = {"Fully Disagree":1, "Disagree":2, "Neither disagree nor agree":3, "Agree":4, "Fully agree":5}
+    >>> me_quartiles(ex1, levels=order)
+        Q1   Q3         Q1 text                     Q3 text
+    0  1.0  3.0  Fully Disagree  Neither disagree nor agree
+    
+    Example 2: Numeric data
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> me_quartiles(ex2)
+        Q1   Q3
+    0  2.0  5.0
     
     '''
-    
+    if type(data) is list:
+        data = pd.Series(data)
+        
     data = data.dropna()
     if levels is not None:
         dataN = data.replace(levels)
@@ -157,7 +178,7 @@ def me_quartiles(data, levels=None, method="own", indexMethod="sas1", q1Frac="li
     else:
         dataN = pd.to_numeric(data)
     
-    dataN = dataN.sort_values()
+    dataN = dataN.sort_values().reset_index(drop=True)
     dataN = list(dataN)
     
     #alternative namings

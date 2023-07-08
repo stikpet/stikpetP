@@ -3,32 +3,27 @@ import pandas as pd
 def me_mode_bin(data, bins, allEq="none", value="none"):
     '''
     Mode for Binned Data
+    --------------------
     
-    The mode is a measure of central tendency and defined as “the abscissa corresponding to the ordinate of maximum 
-    frequency” (Pearson, 1895, p. 345). A more modern definition would be “the most common value obtained in a set 
-    of observations” (Weisstein, 2002).
+    The mode is a measure of central tendency and defined as “the abscissa corresponding to the ordinate of maximum frequency” (Pearson, 1895, p. 345). A more modern definition would be “the most common value obtained in a set of observations” (Weisstein, 2002).
 
-    For binned data the mode is the bin with the highest frequency density. This will have the same result as using 
-    the highest frequency if all bins are of equal size. A frequency density is the frequency divided by the bin size 
-    (Zedeck, 2014, pp. 144-145). Different methods exist to narrow this down to a single value. See the notes for more 
-    info on this.
+    For binned data the mode is the bin with the highest frequency density. This will have the same result as using the highest frequency if all bins are of equal size. A frequency density is the frequency divided by the bin size (Zedeck, 2014, pp. 144-145). Different methods exist to narrow this down to a single value. See the notes for more info on this.
 
-    The word mode might even come from the French word 'mode' which means fashion. Fashion is what most people wear, 
-    so the mode is the option most people chose.
+    The word mode might even come from the French word 'mode' which means fashion. Fashion is what most people wear, so the mode is the option most people chose.
 
-    If one category has the highest frequency this category will be the modal category and if two or more categories have 
-    the same highest frequency each of them will be the mode. If there is only one mode the set is sometimes called unimodal, 
-    if there are two it is called bimodal, with three trimodal, etc. For two or more, thse term multimodal can also be used.
+    If one category has the highest frequency this category will be the modal category and if two or more categories have the same highest frequency each of them will be the mode. If there is only one mode the set is sometimes called unimodal, if there are two it is called bimodal, with three trimodal, etc. For two or more, thse term multimodal can also be used.
 
-    An advantage of the mode over many other measures of central tendency (like the median and mean), is that it can be 
-    determined for already nominal data types.
+    An advantage of the mode over many other measures of central tendency (like the median and mean), is that it can be determined for already nominal data types.
 
     Parameters
     ----------
-    data : pandas data series
-    bins : list with tuples, each a lower and upper bound
-    allEq : optional indicator on what to do if maximum frequency is equal for more than one category. Either "none" (default), or "all"
-    value : optional which value to show in the output. Either "none" (default), "midpoint", or "quadratic"
+    data : list or pandas data series
+    bins : list 
+        a list with tuples, each a lower and upper bound
+    allEq : {"none", "all"}, optional 
+        indicator on what to do if maximum frequency is equal for more than one category. Default is "none"
+    value : {"none", "midpoint", "quadratic"} 
+        optional which value to show in the output. Default is "none"
 
     Returns
     -------
@@ -43,7 +38,7 @@ def me_mode_bin(data, bins, allEq="none", value="none"):
 
     If *value="midpoint"* is used the modal bin(s) midpoints are shown, using:
     $$MP_m = \\frac{UB_m + LB_m}{2}$$
-    Where \(UB_m\) is the upper bound of the modal bin, and \(LB_m\) the lower bound.
+    Where \\(UB_m\\) is the upper bound of the modal bin, and \\(LB_m\\) the lower bound.
 
     If *value="quadratic"* is used a quadratic curve is made from the midpoint of the bin prior to the modal bin, to 
     the midpoint of the bin after the modal bin. This is done using:
@@ -52,7 +47,7 @@ def me_mode_bin(data, bins, allEq="none", value="none"):
     $$d_1 = FD_m - FD_{m -1}$$
     $$d_2 = FD_m - FD_{m + 1}$$
 
-    Where \(FD_m\) is the frequency density of the modal category.
+    Where \\(FD_m\\) is the frequency density of the modal category.
 
     **Multimode**
 
@@ -80,14 +75,27 @@ def me_mode_bin(data, bins, allEq="none", value="none"):
     Author
     ------
     Made by P. Stikker
-
-    Please visit: https://PeterStatistics.com
-
-    YouTube channel: https://www.youtube.com/stikpet
     
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
+    
+    Examples
+    --------
+    >>> import pandas as pd
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['age']
+    >>> ex1 = ex1.replace({'89 OR OLDER': 89})
+    >>> ex1 = pd.to_numeric(ex1)
+    >>> bins = [(0, 20), (20, 50), (50, 70), (70, 90)]
+    >>> me_mode_bin(ex1, bins=bins)
+          mode   mode fd.
+    0  20 < 50  34.833333
     
     '''
-    
+    if type(data) is list:
+        data = pd.Series(data)
+        
     freq = pd.DataFrame(columns=["lb", "ub", "f", "fd"])
     for i in bins:
         f = len(data[((data < i[1]) * (data >= i[0]))])

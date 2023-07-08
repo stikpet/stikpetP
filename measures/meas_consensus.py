@@ -4,13 +4,15 @@ import numpy as np
 def me_consensus(data, levels=None):
     '''
     Consensus
+    ---------
     
     The Consensus is a measure of agreement or dispersion for ordinal data. If there is no agreement the value is 0, and with full agreement 1.
     
     Parameters
     ----------
-    data : pandas series with
-    levels : optional dictionary with coding to use
+    data : list or pandas series 
+    levels : dictionary, optional
+        with coding to use
     
     Returns
     -------
@@ -27,10 +29,11 @@ def me_consensus(data, levels=None):
     $$p_i = \\frac{F_i}{n}$$
     
     *Symbols used:*
-    * \(X_i\) the rank of category i
-    * \(F_i\) the frequency (count) of the i-th category (after they have been sorted)
-    * \(n\) the sample size
-    * \(k\) the number of categories.
+    
+    * \\(X_i\\) the rank of category i
+    * \\(F_i\\) the frequency (count) of the i-th category (after they have been sorted)
+    * \\(n\\) the sample size
+    * \\(k\\) the number of categories.
     
     References 
     ----------
@@ -40,11 +43,29 @@ def me_consensus(data, levels=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet    
+    Examples
+    --------
+    Example 1: Text Pandas Series
+    >>> import pandas as pd
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Teach_Motivate']
+    >>> order = {"Fully Disagree":1, "Disagree":2, "Neither disagree nor agree":3, "Agree":4, "Fully agree":5}
+    >>> me_consensus(ex1, levels=order)
+    0.42896860013343574
     
+    Example 2: Numeric data
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> me_consensus(ex2)
+    0.3340394927779964
+
     '''
+    
+    if type(data) is list:
+        data = pd.Series(data)
         
     data = data.dropna()
     if levels is not None:
