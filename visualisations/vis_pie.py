@@ -3,22 +3,22 @@ import pandas as pd
 
 def vi_pie(data, labels=None):  
     '''
+    Pie Chart
+    ---------
+    
     A pie-chart is a “graphic display in which a circle is cut into wedges with the area of each wedge being proportional to the percentage of cases in the category represented by that wedge” (Zedeck, 2014, p. 260). 
     
     A video on pie charts is available [here](https://youtu.be/e6JtJsh-6iw).
     
     Parameters
     ----------
-    data : the data for which to create a pie-chart from, either a list or Pandas series
-    labels what to show besides the labels
-    
-    Returns
-    -------
-    chart the pie chart
+    data : list or pandas series
+    labels : string, optional,
+        what to show besides the labels
     
     Notes
     -----
-    It is possible to either show only the labels (label="none"), the counts (label="counts"), the percentages (label="percent"), or both count and percent (label="both").
+    It is possible to either show only the labels (label="none"), the counts (label="count"), the percentages (label="percent"), or both count and percent (label="both").
     
     The function uses the matplotlib pyplot library *plot* function, rotated and counter clockwise.
     
@@ -46,15 +46,23 @@ def vi_pie(data, labels=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
-    >>> vi_pie(data) 
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> vi_pie(ex1);
+    >>> vi_pie(ex1, labels="percent");
+    >>> vi_pie(ex1, labels="none");
+    >>> vi_pie(ex1, labels="both");
     
+    Example 2: a list
+    >>> ex2 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> vi_pie(ex2);
     
     '''
     
@@ -75,4 +83,7 @@ def vi_pie(data, labels=None):
         freq.plot(kind='pie', ylabel="", startangle=90, autopct=lambda x: str(round(x*freq.sum()/100)))
     elif labels=="both":
         freq.plot(kind='pie', ylabel="", startangle=90, autopct=lambda x: str(round(x*freq.sum()/100)) + "; " + str(round(x,1)) + "%")
+        
+    plt.show
+    
     return

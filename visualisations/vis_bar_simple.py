@@ -4,6 +4,7 @@ import pandas as pd
 def vi_bar_simple(data, varname=None, height="count"):
     '''
     Simple Bar Chart
+    ----------------
     
     A bar-chart is defined as “a graph in which bars of varying height with spaces between them are  used to display data for variables defined by qualities or categories” (Zedeck, 2014, p. 20). 
     
@@ -11,13 +12,12 @@ def vi_bar_simple(data, varname=None, height="count"):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    varname : optional name for the variable
-    height : optional to indicate what the height should represent
-    
-    Returns
-    -------
-    plt : a pyplot diagram
+    data : list or pandas data series 
+        the data
+    varname : string, optional 
+        name for the variable
+    height : {"count", "percent"}, optional 
+        indicate what the height should represent. Default is "count"
     
     Notes
     -----
@@ -45,17 +45,21 @@ def vi_bar_simple(data, varname=None, height="count"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
-    >>> vi_bar_simple(data) 
-    >>> vi_bar_simple(data, varname="marital")
-    >>> vi_bar_simple(data, varname="marital", height="percent")
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> vi_bar_simple(ex1);
+    >>> vi_bar_simple(ex1, varname="marital status", height="percent");
     
+    Example 2: a list
+    >>> ex2 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> vi_bar_simple(ex2);
     
     '''
     
@@ -75,5 +79,6 @@ def vi_bar_simple(data, varname=None, height="count"):
     
     plt.xlabel(varname)
     plt.xticks(rotation=45)
-        
-    return plt
+    plt.show
+    
+    return

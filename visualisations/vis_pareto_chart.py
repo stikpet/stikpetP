@@ -4,6 +4,7 @@ import pandas as pd
 def vi_pareto_chart(data, varname=None):
     '''
     Pareto Chart
+    ------------
     
     The Pareto Chart gets its name from the Pareto Principle, which is named after Vilfredo Pareto. This principle states that roughly 80% of consequencies come from 20% of causes (Pareto, 1896).
     
@@ -17,12 +18,9 @@ def vi_pareto_chart(data, varname=None):
     
     Parameters
     ----------
-    data the data from which to create a Pareto chart
-    varname a name for the data, if not provided the name of the data variable is used
-    
-    Returns
-    -------
-    a Pareto chart
+    data : list or pandas series
+    varname : string, optional 
+        a name for the data, if not provided the name of the data variable is used
     
     Notes
     -----
@@ -48,14 +46,20 @@ def vi_pareto_chart(data, varname=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
-    >>> vi_pareto_chart(data)
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> vi_pareto_chart(ex1);
+    
+    Example 2: a list
+    >>> ex2 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> vi_pareto_chart(ex2);
     
     '''
     
@@ -84,4 +88,5 @@ def vi_pareto_chart(data, varname=None):
     ax2.set_ylabel("cumulative percent")
     ax2.set_ylim(ymin=0)    
     
-    return plt
+    plt.show()
+    return

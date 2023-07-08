@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 def vi_bar_stacked_single(data, catCoding = None, orientation = "h"):    
     '''
     Single Stacked Bar-Chart
+    ------------------------
     
     A regular bar-chart but with the bars on top of each other, instead of next to each other. This is called a compound bar chart, stacked bar chart (Wilkinson, 2005, p. 157) or component bar chart (Zedeck, 2014, p. 54). 
     
@@ -11,13 +12,12 @@ def vi_bar_stacked_single(data, catCoding = None, orientation = "h"):
     
     Parameters
     ----------
-    data : pandas series with the data
-    catCoding : optional dictionary with the coding to use
-    orientation : optional to indicate horizontal or vertical chart, "h" (default) or "v"
-    
-    Returns
-    -------
-    pyplot chart
+    data : list or pandas series 
+        the data
+    catCoding : dictionary, optional 
+        the coding to use
+    orientation : {"h", "v"}, optional 
+        indicate horizontal or vertical chart, Default is "h"
     
     Notes
     -----
@@ -35,11 +35,29 @@ def vi_bar_stacked_single(data, catCoding = None, orientation = "h"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet
+    Examples
+    ---------    
+    Example 1: pandas series
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Teach_Motivate']
+    >>> order = {"Fully Disagree":1, "Disagree":2, "Neither disagree nor agree":3, "Agree":4, "Fully agree":5}
+    >>> vi_bar_stacked_single(ex1, catCoding=order);
+    >>> vi_bar_stacked_single(ex1, catCoding=order, orientation="v");
+    
+    Example 2: Numeric data
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> vi_bar_stacked_single(ex2);
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> vi_bar_stacked_single(ex2);
+
     
     '''
+    if type(data) is list:
+        data = pd.Series(data)
     
     if catCoding is not None:
         data = data.replace(catCoding)
@@ -73,4 +91,6 @@ def vi_bar_stacked_single(data, catCoding = None, orientation = "h"):
         frame1 = plt.gca()
         frame1.axes.get_yaxis().set_visible(False)
         
-    return plt
+    plt.show()
+        
+    return

@@ -1,9 +1,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from ..other.table_frequency import tab_frequency
 
-def vi_bar_dual_axis(data, varname=None):
+def vi_bar_dual_axis(data, varname=None, order=None):
     '''
     Dual-Axis Bar Chart
+    -------------------
     
     A dual axis bar-chart is a bar-chart with two vertical axis. In this function it will show both the count and cumulative proportion. 
     
@@ -11,8 +13,12 @@ def vi_bar_dual_axis(data, varname=None):
     
     Parameters
     ----------
-    data : a pandas series with the data
-    varname : optional string for the horizontal axis (default is series name)
+    data : list or pandas series 
+        the data
+    varname : string, optional 
+        label for the horizontal axis. Default is series name
+    order : list or dictionary, optional 
+        the order of the categories
     
     Returns
     -------
@@ -26,35 +32,39 @@ def vi_bar_dual_axis(data, varname=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
 
+    Examples
+    --------
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> vi_bar_dual_axis(ex1);
+    >>> vi_bar_dual_axis(ex1, varname="marital status");
 
     '''
     
     field = data.name
-    myFreq = data.value_counts().sort_index()
-    myKeys = myFreq.keys()
-    myVals = myFreq.values
-    myFreqTable = pd.DataFrame({field: myKeys, 'Frequency': myVals})
-    myFreqTable['Percent'] = myFreqTable['Frequency']/myFreqTable['Frequency'].sum()*100
-    myFreqTable['Cumulative Percent'] = myFreqTable['Frequency'].cumsum() / myFreqTable['Frequency'].sum() * 100
+    
+    myFreqTable = tab_frequency(data=data, order=order)
     
     if varname is None:
         xlab = field
     else:
         xlab = varname
-    
+
     fig,ax=plt.subplots()
     ax.set_xlabel(xlab)
-    ax.bar(field, 'Frequency', data = myFreqTable)
+    ax.bar(myFreqTable.index, 'Frequency', data = myFreqTable)
     ax.set_ylabel("frequency")
     ax.set_ylim(ymin=0)
 
     ax2=ax.twinx()
-    ax2.plot(field, 'Cumulative Percent', data = myFreqTable, marker='o', color='red')
+    ax2.plot(myFreqTable.index, 'Cumulative Percent', data = myFreqTable, marker='o', color='red')
     ax2.set_ylabel("cumulative percent")
     ax2.set_ylim(ymin=0)
     
-    return plt
+    plt.show()
+    
+    return

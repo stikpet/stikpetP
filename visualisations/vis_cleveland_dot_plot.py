@@ -5,6 +5,7 @@ def vi_cleveland_dot_plot(data):
     
     '''
     Simple Bar Chart
+    ----------------
     
     A Cleveland dot plot (Cleveland & McGill, 1987) is a bar chart where instead of bars a dot is placed at the center of the top of the bar (and then the bars removed). It is a dot plot only showing the top dot.This requires less ink. 
     
@@ -14,11 +15,8 @@ def vi_cleveland_dot_plot(data):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    
-    Returns
-    -------
-    plt : a pyplot diagram
+    data : list or pandas data series
+        the data
     
     Notes
     -----
@@ -32,14 +30,20 @@ def vi_cleveland_dot_plot(data):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
-    >>> vi_cleveland_dot_plot(data) 
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> vi_cleveland_dot_plot(ex1);
+    
+    Example 2: a list
+    >>> ex2 = ["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"]
+    >>> vi_cleveland_dot_plot(ex2);
     
     '''
     
@@ -50,5 +54,5 @@ def vi_cleveland_dot_plot(data):
     
     plt.scatter(x=freq.keys(), y=freq.values)
     plt.ylabel('Frequency')
-    
-    return plt
+    plt.show()
+    return
