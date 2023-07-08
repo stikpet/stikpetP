@@ -4,41 +4,51 @@ import pandas as pd
 def es_jbm_e(chi2, n, minExp, test='chi'):
     '''
     Johnston-Berry-Mielke E
+    -----------------------
      
     An effect size measure that could be used with a chi-square test or g-test. 
     
     Parameters
     ----------
-    chi2 : the chi-square test statistic
-    n : the sample size
-    minExp: the minimum expected count
-    test : either "chi" (default) for chi-square tests, or "g" for likelihood ratio
+    chi2 : float
+        the chi-square test statistic
+    n : int
+        the sample size
+    minExp: float
+        the minimum expected count
+    test : {"chi", "g"}, optional
+        either "chi" (default) for chi-square tests, or "g" for likelihood ratio
         
     Returns
     -------
-    E : the value of JBM E
+    E : float
+        the value of JBM E
    
     Notes
     -----
     Two versions of this effect size. The formula for a chi-square test is:
     $$E_{\\chi^2}=\\frac{q}{1-q}\\times \\left(\\sum_{i=1}^{k}\\frac{p_{i}^{2}}{q_{i}}-1\\right) = \\frac{\\chi_{GoF}^2\\times E_{min}}{n\\times\\left(n - E_{min}\\right)}$$
     For a Likelihood Ratio (G) test:
-    $$E_{L}=-\\frac{1}{\\textup{ln}(q)}\\times\\sum_{i=1}^{k}\\left(p_{i}\\times\\textup{ln}\\left(\\frac{p_{i}}{q_{i}}\\right)\\right) = -\\frac{1}{\\textup{ln}\\left(q\\right)\\times\\frac{\\chi_L^2}{2\\times n}}$$
+    $$E_{L}=-\\frac{1}{\\text{ln}(q)}\\times\\sum_{i=1}^{k}\\left(p_{i}\\times\\text{ln}\\left(\\frac{p_{i}}{q_{i}}\\right)\\right) = -\\frac{1}{\\text{ln}\\left(q\\right)\\times\\frac{\\chi_L^2}{2\\times n}}$$
     
     *Symbols used:*
-    * \(q\) the minimum of all \(q_i\)
-    * \(q_i\) the expected proportion in category i
-    * \(p_i\) the observed proportion in category i
-    * \(n\) the total sample size
-    * \(E_min\) the minimum expected count
-    * \(\\chi_{GoF}^2\) the chi-square test statistic of a Pearson chi-square test of goodness-of-fit
-    * \(\\chi_L^2\) the chi-square test statistic of a likelihood ratio test of goodness-of-fit 
+    
+    * \\(q\\) the minimum of all \\(q_i\\)
+    * \\(q_i\\) the expected proportion in category i
+    * \\(p_i\\) the observed proportion in category i
+    * \\(n\\) the total sample size
+    * \\(E_{min}\\) the minimum expected count
+    * \\(\\chi_{GoF}^2\\) the chi-square test statistic of a Pearson chi-square test of goodness-of-fit
+    * \\(\\chi_L^2\\) the chi-square test statistic of a likelihood ratio test of goodness-of-fit 
     
     Both formulas are from Johnston et al. (2006, p. 413)
     
-    A qualification rule-of-thumb could be obtained by converting this to Cohen's w, using **es_convert(E, from=="jbme", to=="cohenw", ex1 = minExp/n)**
+    A qualification rule-of-thumb could be obtained by converting this to Cohen's w
     
-    The rule-of-thumb can then be obtained using **th_cohen_w(w)**
+    See Also
+    --------
+    stikpetP.effect_sizes.convert_es.es_convert : to convert JBM-E to Cohen w, use fr="jbme", to="cohenw", and ex1=minExp/n
+    stikpetP.other.thumb_cohen_w.th_cohen_w : rules-of-thumb for Cohen w
     
     References
     ----------
@@ -48,17 +58,19 @@ def es_jbm_e(chi2, n, minExp, test='chi'):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> chi2Value = 3.105263
+    >>> chi2Value = 3.106
     >>> n = 19
-    >>> minExp = n/4
+    >>> minExp = 3
     >>> es_jbm_e(chi2Value, n, minExp)
+    0.030651315789473683
     >>> es_jbm_e(chi2Value, n, minExp, test="likelihood")
+    0.04428196998451468
     
     '''
     if test=='chi':

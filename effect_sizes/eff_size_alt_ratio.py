@@ -3,6 +3,7 @@ import pandas as pd
 def es_alt_ratio(data, codes=None, p0=0.5, category=None):
     '''
     Alternative Ratio
+    -----------------
      
     The Alternative Ratio is an effect size measure that could be accompanying a one-sample binomial, score or Wald test.It is simply the sample proportion (percentage), divided by the expected population proportion (often set at 0.5)
     
@@ -10,14 +11,20 @@ def es_alt_ratio(data, codes=None, p0=0.5, category=None):
     
     Parameters
     ----------
-    data : list or Pandas data series with the data
-    codes : optional list with the two codes to use
-    p0 : optional probability for first category
+    data : list or pandas data series 
+        the data
+    codes : list, optional 
+        the two codes to use
+    p0 : float, optional 
+        probability for first category. Default is 0.5
     category : optional the category to count as first category
         
     Returns
     -------
-    testResults : Pandas dataframe with the two Alternative Ratios.
+    results : pandas dataframe with:
+    
+    * *AR1*, the alternative category for one category
+    * *AR2*, the alternative category for the other category
    
     Notes
     -----
@@ -29,8 +36,9 @@ def es_alt_ratio(data, codes=None, p0=0.5, category=None):
     $$AR=\\frac{p}{\\pi}$$
     
     *Symbols used*:
-    * \(p\) is the sample proportion of one of the categories
-    * \(\\pi\) the expected proportion
+    
+    * \\(p\\) is the sample proportion of one of the categories
+    * \\(\\pi\\) the expected proportion
     
     References
     ----------
@@ -42,19 +50,53 @@ def es_alt_ratio(data, codes=None, p0=0.5, category=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> dataList = ["Female", "Male", "Male", "Female", "Male", "Male"]
-    >>> data = pd.Series(dataList)
-    >>> es_alt_ratio(data)
-    >>> es_alt_ratio(data, category='Male')
-    >>> es_alt_ratio(data, codes=['Female', 'Male'])
+    
+    Example 1: Numeric list
+    >>> ex1 = [1, 1, 2, 1, 2, 1, 2, 1]
+    >>> es_alt_ratio(ex1)
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0              1.25              0.75
+    
+    >>> es_alt_ratio(ex1, p0=0.3)
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0          2.083333          0.535714
+    
+    Example 2: Text list
+    >>> ex2 = ["Female", "Male", "Male", "Female", "Male", "Male"]
+    >>> es_alt_ratio(ex2)
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0          1.333333          0.666667
+    
+    >>> es_alt_ratio(ex2, category='Female')
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0          0.666667          1.333333
+    
+    >>> es_alt_ratio(ex2, codes=['Female', 'Male'])
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0          0.666667          1.333333
+    
+    Example 3: pandas Series
+    >>> import pandas as pd
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> es_alt_ratio(df1['sex'])
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0           1.10233           0.89767
+
+    >>> es_alt_ratio(df1['mar1'], codes=["DIVORCED", "NEVER MARRIED"])
+       Alt.Ratio Cat. 1  Alt.Ratio Cat. 2
+    0          0.885755          1.114245
     
     '''
+    
+    if type(data) is list:
+        data = pd.Series(data)
+        
     if codes is None:
         freq = data.value_counts()
         n = sum(freq.values)
@@ -82,6 +124,6 @@ def es_alt_ratio(data, codes=None, p0=0.5, category=None):
     AR1 = p1 / p0
     AR2 = p2 / (1 - p0)
     
-    testResults = pd.DataFrame([[AR1, AR2]], columns=["Alt.Ratio Cat. 1", "Alt.Ratio Cat. 2"])
+    results = pd.DataFrame([[AR1, AR2]], columns=["Alt.Ratio Cat. 1", "Alt.Ratio Cat. 2"])
     
-    return (testResults)
+    return (results)

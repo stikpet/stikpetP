@@ -3,19 +3,25 @@ import pandas as pd
 def es_dominance(data, levels=None, mu=None, out="dominance"):
     '''
     Dominance and a Vargha-Delaney A like effect size measure
+    ---------------------------------------------------------
     
     This measure could be used with a sign test, since it does not rely on a z-value.
     
     Parameters
     ----------
-    data : pandas data series with the data
-    levels : optional dictionary with the categories and numeric value to use
-    mu : optional parameter to set the hypothesized median. If not used the midrange is used
-    out : optional to either show the "dominance" score (default), or a "vda" like measure
+    data : list or pandas data series 
+        the data
+    levels : dictionary, optional
+        the categories and numeric value to use
+    mu : float, optional 
+        parameter to set the hypothesized median. If not used the midrange is used
+    out : {"dominance", "vda"}, optional 
+        to either show the "dominance" score (default), or a "vda" like measure
         
     Returns
     -------
-    testResults : pandas dataframe with mu and the requested value
+    testResults : pandas dataframe 
+        with mu and the requested value
    
     Notes
     -----
@@ -26,11 +32,12 @@ def es_dominance(data, levels=None, mu=None, out="dominance"):
     $$p_i = \\frac{n_i}{n}$$
     
     *Symbols used:*
-    * \(p_{pos}\) the proportion of cases above the hypothesized median
-    * \(p_{neg}\) the proportion of cases below the hypothesized median
-    * \(n_{pos}\) the number of cases above the hypothesized median
-    * \(n_{neg}\) the number of cases below the hypothesized median
-    * \(n\) the total number of cases
+    
+    * \\(p_{pos}\\) the proportion of cases above the hypothesized median
+    * \\(p_{neg}\\) the proportion of cases below the hypothesized median
+    * \\(n_{pos}\\) the number of cases above the hypothesized median
+    * \\(n_{neg}\\) the number of cases below the hypothesized median
+    * \\(n\\) the total number of cases
     
     The dominance score will range from -1 to 1.
     
@@ -47,19 +54,32 @@ def es_dominance(data, levels=None, mu=None, out="dominance"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> dataList = [1, 2, 5, 1, 1, 5, 3, 1, 5, 1, 1, 5, 1, 1, 3, 3, 3, 4, 2, 4]
-    >>> data = pd.Series(dataList)
-    >>> es_dominance(data)
-    >>> es_dominance(data, mu = 2)
+    Example 1: Text Pandas Series
+    >>> import pandas as pd
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df2['Teach_Motivate']
+    >>> order = {"Fully Disagree":1, "Disagree":2, "Neither disagree nor agree":3, "Agree":4, "Fully agree":5}
+    >>> es_dominance(ex1, levels=order)
+        mu  dominance
+    0  3.0  -0.296296
+    
+    Example 2: Numeric data
+    >>> ex2 = [1, 1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5]
+    >>> es_dominance(ex2)
+        mu  dominance
+    0  3.0   0.222222
+    
     
     '''
-    
+    if type(data) is list:
+        data = pd.Series(data)
+        
     #remove missing values
     data = data.dropna()
     if levels is not None:
@@ -86,11 +106,11 @@ def es_dominance(data, levels=None, mu=None, out="dominance"):
     title = "dominance"
     
     if out=="vda":
-        res = (dominance + 1)/2
+        res = (res + 1)/2
         title = "VDA-like"
     
     #prepare results
-    testResults = pd.DataFrame([[mu, res]], columns=["mu", title])        
+    results = pd.DataFrame([[mu, res]], columns=["mu", title])        
     pd.set_option('display.max_colwidth', None)
     
-    return(testResults)
+    return(results)

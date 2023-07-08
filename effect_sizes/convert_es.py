@@ -3,20 +3,27 @@ import math
 def es_convert(es, fr, to, ex1=None, ex2=None):
     '''
     Convert Effect Sizes
+    --------------------
     
     Function to convert various effect sizes to other effect sizes.
     
     Parameters
     -----------
-    es : the effect size value to convert
-    fr : name of the original effect size (see details)
-    to : name of the effect size to convert to (see details)
-    ex1 : extra for some conversions (see details)
-    ex2 : extra for some conversions (see details)
+    es : float
+        the effect size value to convert
+    fr : string
+        name of the original effect size (see details)
+    to : string
+        name of the effect size to convert to (see details)
+    ex1 : float or string, optional
+        extra for some conversions (see details)
+    ex2 : float or string, optional
+        extra for some conversions (see details)
     
     Returns
     -------
-    res : the converted effect size value
+    res : float
+        the converted effect size value
     
     Notes
     -----
@@ -74,7 +81,7 @@ def es_convert(es, fr, to, ex1=None, ex2=None):
     fr="cramervgof", to = "cohenw", ex1 = k
     
     This uses (Cohen, 1988, p. 223):
-    $$w = v\\times\\sqrt{df - 1}$$
+    $$w = v\\times\\sqrt{k - 1}$$
     
     **EPSILON SQUARED**
     
@@ -201,9 +208,10 @@ def es_convert(es, fr, to, ex1=None, ex2=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet
     '''
     
     #"or", "cohend" , "yuleq", "yuley", "vda", "rb"
@@ -214,7 +222,7 @@ def es_convert(es, fr, to, ex1=None, ex2=None):
     #COHEN d
     #Cohen d one-sample to Cohen d
     if(fr=="cohendos" and to=="cohend"):
-        res = es*sqrt(2)
+        res = es*(2)**0.5
       #Cohen d to Odds Ratio
     elif(fr=="cohend" and to=="or"):
         #Chinn (2000, p. 3129)
@@ -222,7 +230,7 @@ def es_convert(es, fr, to, ex1=None, ex2=None):
             res = math.exp(1.81*es)
         else:
             #Borenstein et. al (2009, p. 3)
-            res = exp(es*pi/sqrt(3))
+            res = math.exp(es*math.pi/(3**0.5))
             
     #COHEN F
     #Cohen f to eta squared
@@ -237,12 +245,12 @@ def es_convert(es, fr, to, ex1=None, ex2=None):
     #COHEN w
     #Cohen w to Contingency Coefficient
     elif(fr=="cohenw" and to=="cc"):
-        res = sqrt(es**2 / (1 + es**2))
+        res = (es**2 / (1 + es**2))**0.5
         
     #CONTINGENCY COEFFICIENT
     #Contingency Coefficient to Cohen w
     elif(fr=="cc" and to=="cohenw"):
-        res = sqrt(es**2 / (1 - es**2))
+        res = (es**2 / (1 - es**2))**0.5
         
     #CRAMÉR V
     #Cramer's v GoF to Cohen w
