@@ -39,15 +39,15 @@ def he_quartileIndex(data, indexMethod, q1Frac="linear", q1Int="int", q3Frac="li
     $$X\\left[\\lfloor iQ_i \\rfloor\\right] + \\frac{iQ_i - \\lfloor iQ_i \\rfloor}{\\lceil iQ_i \\rceil - \\lfloor iQ_i \\rfloor} \\times \\left(X\\left[\\lceil iQ_i \\rceil\\right] - X\\left[\\lfloor iQ_i \\rfloor\\right]\\right)$$
 
     Where:
-    * \(X\\left[x\\right]\) is the x-th score of the sorted scores 
-    * \(\\lfloor\\dots\\rfloor\) is the function to always round down
-    * \(\\lceil\\dots\\rceil\) is the function to always round up
+    * \\(X\\left[x\\right]\\) is the x-th score of the sorted scores 
+    * \\(\\lfloor\\dots\\rfloor\\) is the function to always round down
+    * \\(\\lceil\\dots\\rceil\\) is the function to always round up
 
     Or we can use 'rounding'. But there are different versions of rounding. Besides the already mentioned round down (use *q1Frac* and/or *q3Frac* as **down**) and round up versions (use *q1Frac* and/or *q3Frac* as **up**):
 
-    * \(\\lfloor\\dots\\rceil\) to indicate rounding to the nearest even integer. A value of 2.5 gets rounded to 2, while 1.5 also gets rounded to 2. This is also referred to as *bankers* method. Use *q1Frac* and/or *q3Frac* as **bankers**.
-    * \(\\left[\\dots\\right]\) to indicate rounding to the nearest integer. A value that ends with .5 is then always rounded up. Use *q1Frac* and/or *q3Frac* as **nearest**.
-    * \(\\left< \\dots\\right>\) to indicate to round a value ending with .5 always down. Use *q1Frac* and/or *q3Frac* as **halfdown**.
+    * \\(\\lfloor\\dots\\rceil\\) to indicate rounding to the nearest even integer. A value of 2.5 gets rounded to 2, while 1.5 also gets rounded to 2. This is also referred to as *bankers* method. Use *q1Frac* and/or *q3Frac* as **bankers**.
+    * \\(\\left[\\dots\\right]\\) to indicate rounding to the nearest integer. A value that ends with .5 is then always rounded up. Use *q1Frac* and/or *q3Frac* as **nearest**.
+    * \\(\\left< \\dots\\right>\\) to indicate to round a value ending with .5 always down. Use *q1Frac* and/or *q3Frac* as **halfdown**.
 
     or even use the midpoint again i.e.:
 

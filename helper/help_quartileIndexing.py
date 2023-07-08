@@ -85,6 +85,9 @@ def he_quartileIndexing(data, method="sas1"):
     YouTube channel: https://www.youtube.com/stikpet
     
     '''
+    
+    
+    
     n = len(data)
     if method=="inclusive":
         if (n % 2) == 0:
