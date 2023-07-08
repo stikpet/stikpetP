@@ -3,6 +3,7 @@ import pandas as pd
 def tab_frequency(data, order=None):
     '''
     Frequency Table
+    ---------------
     
     A frequency table is defined as "a table showing (1) all of the values for a variable in a dataset, and (2) the 
     frequency of each of those responses. Some frequency tables also show a cumulative frequency and proportions of 
@@ -20,12 +21,14 @@ def tab_frequency(data, order=None):
     
     Parameters
     ----------
-    data : pandas data series
-    order : optional list or dictionary with the order of the categories
+    data : list or pandas data series
+    order : list or dictionary, optional 
+        specify the order of the categories
     
     Returns 
     -------
     Dataframe with the folowing columns:
+    
     * *data*, the categories
     * *Frequency*, the absolute count
     * *Percent*, the percentage based on the total including missing values
@@ -57,9 +60,10 @@ def tab_frequency(data, order=None):
     $$PR_i = \\frac{F_i}{n}\\times 100$$
     
     *Symbols used:*
-    * \(PR_i\) the percentage of category i
-    * \(F_i\) the (absolute) frequency of category i
-    * \(n\) the sample size, i.e. the sum of all frequencies (either including or excluding the missing values)
+    
+    * \\(PR_i\\) the percentage of category i
+    * \\(F_i\\) the (absolute) frequency of category i
+    * \\(n\\) the sample size, i.e. the sum of all frequencies (either including or excluding the missing values)
     
     The **cumulative frequency** (not shown in table) can be defined as: “the total (absolute) frequency up to the upper boundary 
     of that class” (Kenney, 1939, p. 16). This would only be useful if there is an order to the categories, so we can say that 
@@ -74,7 +78,7 @@ def tab_frequency(data, order=None):
     Or using recursion:
     $$CF_i = F_i + CF_{i-1}$$
     
-    For the cumulative percent the same formulas as for cumulative frequency can be used, but replacing \(F_i\) with \(PR_i\). 
+    For the cumulative percent the same formulas as for cumulative frequency can be used, but replacing \\(F_i\\) with \\(PR_i\\). 
     It can also be determined using the cumulative frequency:
     $$CPR_i = \\frac{CF_i}{n}$$
     
@@ -95,23 +99,76 @@ def tab_frequency(data, order=None):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     --------
-    >>> data = pd.DataFrame(["MARRIED", "DIVORCED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "NEVER MARRIED", "MARRIED", "MARRIED", "MARRIED", "SEPARATED", "DIVORCED", "NEVER MARRIED", "NEVER MARRIED", "DIVORCED", "DIVORCED", "MARRIED"], columns=["marital"])
-    >>> tab_frequency(data['marital'])
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['mar1']
+    >>> tab_frequency(ex1)
+                   Frequency    Percent  Valid Percent  Cumulative Percent
+    DIVORCED             314  15.906788      16.177228           16.177228
+    MARRIED              972  49.240122      50.077280           66.254508
+    NEVER MARRIED        395  20.010132      20.350335           86.604843
+    SEPARATED             79   4.002026       4.070067           90.674910
+    WIDOWED              181   9.169200       9.325090          100.000000
+    
+    Example 2: Text data with specified order
+    >>> tab_frequency(df1['mar1'], order=["MARRIED", "DIVORCED", "NEVER MARRIED", "SEPARATED", "WIDOWED"])
+                   Frequency    Percent  Valid Percent  Cumulative Percent
+    MARRIED              972  49.240122      50.077280           50.077280
+    DIVORCED             314  15.906788      16.177228           66.254508
+    NEVER MARRIED        395  20.010132      20.350335           86.604843
+    SEPARATED             79   4.002026       4.070067           90.674910
+    WIDOWED              181   9.169200       9.325090          100.000000
+    
+    Example 3: Numeric data
+    >>> ex3 = [1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5]
+    >>> tab_frequency(ex3)
+       Frequency    Percent  Valid Percent  Cumulative Percent
+    1          2  16.666667      16.666667           16.666667
+    2          3  25.000000      25.000000           41.666667
+    3          2  16.666667      16.666667           58.333333
+    4          3  25.000000      25.000000           83.333333
+    5          2  16.666667      16.666667          100.000000
+    
+    Example 4: Ordinal data
+    >>> ex4a = [1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, "NaN"]
+    >>> order = {"fully disagree":1, "disagree":2, "neutral":3, "agree":4, "fully agree":5}
+    >>> tab_frequency(ex4a, order=order)
+                    Frequency    Percent  Valid Percent  Cumulative Percent
+    fully disagree          2  15.384615      16.666667           16.666667
+    disagree                3  23.076923      25.000000           41.666667
+    neutral                 2  15.384615      16.666667           58.333333
+    agree                   3  23.076923      25.000000           83.333333
+    fully agree             2  15.384615      16.666667          100.000000
+    
+    >>> ex4b = df1['accntsci']
+    >>> tab_frequency(ex4b, order=["Not scientific at all", "Not too scientific", "Pretty scientific", "Very scientific"])
+                           Frequency    Percent  Valid Percent  Cumulative Percent
+    Not scientific at all        307  15.552178      32.180294           32.180294
+    Not too scientific           348  17.629179      36.477987           68.658281
+    Pretty scientific            199  10.081054      20.859539           89.517820
+    Very scientific              100   5.065856      10.482180          100.000000
     
     '''
+    
+    if type(data) is list:
+        data = pd.Series(data)
+    
     if order is not None:
-        data = data.replace(order)
+        if type(order) is dict:
+            order2 = {y: x for x, y in order.items()}
+            data = data.replace(order2)
+            
         data = pd.Categorical(data, categories=order, ordered=True)
     
     data = data.sort_values()
     
-    freq = data.value_counts()
+    freq = data.value_counts().sort_index()
     perc = freq/sum(data.value_counts(dropna = False))*100
     vperc = freq/sum(freq)*100
     cperc = vperc.cumsum()

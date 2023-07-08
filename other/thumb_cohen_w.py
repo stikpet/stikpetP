@@ -3,28 +3,38 @@ import pandas as pd
 def th_cohen_w(w, qual="cohen"):
     '''
     Rule of thumb for Cohen w
+    --------------------------
     
     Simple function to use a rule-of-thumb for the Cohen w effect size.
     
     Parameters
     ----------
-    w : the Cohen w value
-    qual : optional indication which set of rule-of-thumb to use. Currently only "cohen"
+    w : float
+        the Cohen w value
+    qual : {"cohen"}, optional 
+        indication which set of rule-of-thumb to use. Currently only "cohen"
     
     Returns
     -------
-    results : Pandas dataframe with the classification and source used
+    results : a pandas dataframe with.
+    
+    * *classification*, the qualification of the effect size
+    * *reference*, a reference for the rule of thumb used
     
     Notes
     -----
     Cohen's rule of thumb for Cohen h (1988, p. 227):
     
-    |\|w\|| Interpretation|
+    |\\|w\\|| Interpretation|
     |---|----------|
     |0.00 < 0.10 | negligible |
     |0.10 < 0.30 | small |
     |0.30 < 0.50 | medium |
     |0.50 or more | large |
+    
+    See Also
+    --------
+    stikpetP.effect_sizes.eff_size_cohen_w.es_cohen_w : to determine a Cohen w
     
     References
     ----------
@@ -34,15 +44,16 @@ def th_cohen_w(w, qual="cohen"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
-    
-    YouTube channel: https://www.youtube.com/stikpet
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
     Examples
     -------
-    >>> w = 0.24
-    >>> th_cohen_w(w)
-    
+    >>> es = 0.6
+    >>> th_cohen_w(es)
+      classification             reference
+    0          large  Cohen (1988, p. 227)
     
     '''
     

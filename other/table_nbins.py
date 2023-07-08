@@ -5,6 +5,7 @@ from ..measures.meas_quartile_range import me_quartile_range
 def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     '''
     Number of Bins
+    --------------
     
     To decide on the appropriate number of bins, many different rules can be applied. This function
     will determine the number of bins, based on the chosen method.
@@ -12,9 +13,12 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     Parameters
     ----------
     data : vector or pandas series with numeric data
-    method : optional to indicate the method to use. Either "src", "sturges", "qr", "rice", "ts", "exp", "velleman", "doane", "scott", "fd", "shinshim", "stone", or "knuth"
-    maxBins : optional for in iterations with "shinshim", "stone" and "knuth"
-    qmethod : optional quartile method calculation to use for IQR when "fd" is used. See me_quartiles for options
+    method : {"src", "sturges", "qr", "rice", "ts", "exp", "velleman", "doane", "scott", "fd", "shinshim", "stone", "knuth"}, optional 
+        to indicate the method to use. Default is "src"
+    maxBins : int, optional 
+        for in iterations with "shinshim", "stone" and "knuth"
+    qmethod : string, optional 
+        quartile method calculation to use for IQR when "fd" is used. See me_quartiles for options
     
     Returns
     -------
@@ -28,7 +32,7 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     **Square Root Choice (src)**
     
     This method uses (unknown source):
-    $$k = \\lceil\\sqrt{n}\\rceil$$
+    $$k = \\lceil \\sqrt{n}\\rceil$$
     
     **Sturges Choice (sturges)**
     
@@ -38,7 +42,7 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     **Quartic Root (qr)**
     
     This method uses (anonymous, as cited in Lohaka, 2007, p. 87):
-    $$k = \\lceil 2.5\\times\\sqrt[4]{n}\\rceil$$
+    $$k = \\lceil 2.5\\times \\sqrt[4]{n}\\rceil$$
     
     **Rice Rule (rice)**
     
@@ -48,7 +52,7 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     **Terrell and Scotte (ts)**
     
     This method uses (Terrell & Scott, 1985, p. 212):
-    $$k = \\lceil \\sqrt[3]{2\\times n\\rceil$$
+    $$k = \\lceil \\sqrt[3]{2\\times n}\\rceil$$
     
     **Exponential (exp)**
     
@@ -58,20 +62,20 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     **Velleman (velleman)**
     
     This method uses (Velleman, 1976 as cited in Lohaka, 2007, p. 89):
-    $$k = \\begin{cases}\\lceil 2\\times\\sqrt{n}\\rceil & \\text{ if } n\\leq 100 \\\\ \\lceil 10\\times\\log_{10}\\left(n\\right)\\rceil & \\text{ if } n > 100\\end{cases}$$
+    $$k = \\begin{cases}\\lceil 2\\times \\sqrt{n}\\rceil & \\text{ if } n\\leq 100 \\\\ \\lceil 10\\times \\log_{10}\\left(n\\right)\\rceil & \\text{ if } n > 100\\end{cases}$$
     
     **Doane (doane)**
     
     This method uses (Doane, 1976, pp. 181-182):
     $$k = 1 + \\lceil\\log_2\\left(n\\right) + \\log_2\\left(1+\\frac{\\left|g_1\\right|}{\\sigma_{g_1}}\\right)\\rceil$$
     
-    In the formula's \(g_1\) is the 3rd moment skewness:
-    $$g_1 = \\frac{\\sum_{i=1}^n\\left(x_i-\\bar{x}\\right)^3} {n\\times\\sigma^3} = \\frac{1}{n}\\times\\sum_{i=1}^n\\left(\\frac{x_i-\\bar{x}}{\\sigma}\\right)^3$$
+    In the formula's \\(g_1\\) is the 3rd moment skewness:
+    $$g_1 = \\frac{\\sum_{i=1}^n \\left(x_i-\\bar{x}\\right)^3} {n\\times \\sigma^3} = \\frac{1}{n}\\times \\sum_{i=1}^n \\left(\\frac{x_i-\\bar{x}}{\\sigma}\\right)^3$$
     With:
     $$\\sigma = \\sqrt{\\frac{\\sum_{i=1}^n\\left(x_i-\\bar{x}\\right)^2}{n}}$$
     
-    The \(\sigma_{g_1}\) is defined using the formula:
-    $$\\sigma_{g_1}=\\sqrt{\\frac{6\\times\\left(n-2\\right)}{\\left(n+1\\right)\\left(n+3\\right)}}$$
+    The \\(\sigma_{g_1}\\) is defined using the formula:
+    $$\\sigma_{g_1}=\\sqrt{\\frac{6\\times \\left(n-2\\right)}{\\left(n+1\\right)\\left(n+3\\right)}}$$
     
     Next are methods that determine the bin sizes (h), which can then be used to determine the number of bins (k) using:
     $$k = \\lceil\\frac{\\text{max}\\left(x\\right)-\\text{min}\\left(x\\right)}{h}\\rceil$$
@@ -81,16 +85,16 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     This method uses (Scott, 1979, p. 608):
     $$h = \\frac{3.49\\times s}{\\sqrt[3]{n}}$$
     
-    Where \(s\) is the sample standard deviation:
+    Where \\(s\\) is the sample standard deviation:
     $$s = \\sqrt{\\frac{\\sum_{i=1}^n\\left(x_i-\\bar{x}\\right)^2}{n-1}}$$
     
     **Freedman and Diaconis (fd)**
     
     This method uses (Freedman & Diaconis, 1981, p. 3):
     
-    $$h = 2\\times\\frac{\\text{IQR}\\left(x\\right)}{\\sqrt[3]{n}}$$
+    $$h = 2\\times \\frac{\\text{IQR}\\left(x\\right)}{\\sqrt[3]{n}}$$
     
-    Where \(\\text{IQR}\) is the inter-quartile range.
+    Where \\(\\text{IQR}\\) is the inter-quartile range.
     
     The last three methods all minimize a cost function (or maximize a profit function). They make use of the following steps:
     
@@ -101,23 +105,23 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     **Shimazaki and Shinomoto (shinshim)**
     
     This method uses as a cost function (Shimazaki & Shinomoto, 2007, p. 1508):
-    $$C_k = \\frac{2\\times\\bar{f_k}-\\sigma_{f_k}}{h^2}$$
-    With \(\\bar{f_k}\) being the average of the frequencies when using k bins, and \(\\sigma_{f_k}\) the population variance. 
+    $$C_k = \\frac{2\\times \\bar{f_k}-\\sigma_{f_k}}{h^2}$$
+    With \\(\\bar{f_k}\\) being the average of the frequencies when using k bins, and \\(\\sigma_{f_k}\\) the population variance. 
     In formula notation:
     $$\\bar{f_k}=\\frac{\\sum_{i=1}^k f_{i,k}}{k}$$
     $$\\sigma_{f_k}=\\frac{\\sum_{i=1}^k\\left(f_{i,k}-\\bar{f_k}\\right)^2}{k}$$
     
-    Where \(f_{i,k}\) is the frequency of the i-th bin when using k bins.
+    Where \\(f_{i,k}\\) is the frequency of the i-th bin when using k bins.
     
     **Stone (stone)**
     
     This method uses as a cost function (Stone, 1984, p. 3):
-    $$C_k = \\frac{1}{h}\\times\\left(\\frac{2}{n-1}-\\frac{n+1}{n-1}\\times\\sum_{i=1}^k\\left(\\frac{f_i}{n}\\right)^2\\right)$$
+    $$C_k = \\frac{1}{h}\\times \\left(\\frac{2}{n-1}-\\frac{n+1}{n-1}\\times \\sum_{i=1}^k\\left(\\frac{f_i}{n}\\right)^2\\right)$$
     
     **Knuth (knuth)**
     
     This method uses as a profit function (Knuth, 2019, p. 8):
-    $$P_k=n\\times\\ln\\left(k\\right) + \\ln\\Gamma\\left(\\frac{k}{2}\\right) - k\\times\\ln\\Gamma\\left(\\frac{1}{2}\\right) - \\ln\\Gamma\\left(n+\\frac{k}{2}\\right) + \\sum_{i=1}^k\\ln\\Gamma\\left(f_i+\\frac{1}{2}\\right)$$
+    $$P_k=n\\times \\ln\\left(k\\right) + \\ln\\Gamma\\left(\\frac{k}{2}\\right) - k\\times \\ln\\Gamma\\left(\\frac{1}{2}\\right) - \\ln\\Gamma\\left(n+\\frac{k}{2}\\right)+\\sum_{i=1}^k\\ln\\Gamma\\left(f_i+\\frac{1}{2}\\right)$$
     
     References
     ----------
@@ -145,9 +149,23 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     ------
     Made by P. Stikker
     
-    Please visit: https://PeterStatistics.com
+    Companion website: https://PeterStatistics.com  
+    YouTube channel: https://www.youtube.com/stikpet  
+    Donations: https://www.patreon.com/bePatron?u=19398076
     
-    YouTube channel: https://www.youtube.com/stikpet
+    Examples
+    --------
+    Example 1: pandas series
+    >>> df1 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/GSS2012a.csv', sep=',', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex1 = df1['age']
+    >>> ex1 = ex1.replace({'89 OR OLDER': 89})
+    >>> tab_nbins(ex1)
+    45
+    
+    >>> df2 = pd.read_csv('https://peterstatistics.com/Packages/ExampleData/StudentStatistics.csv', sep=';', low_memory=False, storage_options={'User-Agent': 'Mozilla/5.0'})
+    >>> ex2 = df2['Gen_Age']
+    >>> tab_nbins(ex2)
+    7
     
     '''
     
@@ -155,6 +173,9 @@ def tab_nbins(data, method='src', maxBins=100, qmethod="cdf"):
     
     #remove missing values
     data = data.dropna()
+    
+    #make sure it is numeric
+    data = pd.to_numeric(data)
     
     n = len(data)
     
